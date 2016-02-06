@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 
 
@@ -10,25 +10,16 @@ def read(filename):
 
 setup(
     name         = "glud",
-    version      = "0.0.1",
-    description  = "TBD",
+    version      = "0.0.3",
+    description  = "Tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
     author       = "Andrew Walker",
     author_email = "walker.ab@gmail.com",
     url          = "http://github.com/AndrewWalker/glud",
     license      = "MIT",
     zip_safe     = False,
-    packages     = ['glud'],
-    package_dir  = { 'glud' : 'glud' },
-    package_data = {
-        'glud' : ['templates/*.tpl']
-    },
-    entry_points = {
-        'console_scripts' : [
-            'glud = glud:main'
-        ]
-    },
-    classifiers  = [
+    packages     = {'glud', 'glud'}, 
+        classifiers  = [
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
@@ -37,5 +28,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: Software Development :: Code Generators',
     ],
+    tests_require=['unittest2'],
+    test_suite='unittest2.collector'
 )
 

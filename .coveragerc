@@ -1,0 +1,5 @@
+[run]
+source=glud
+
+[report]
+include=glud*
