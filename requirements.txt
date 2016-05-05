@@ -2,3 +2,4 @@ coverage
 coveralls
 PyYAML
 toolz
+asciitree
