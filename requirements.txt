@@ -3,3 +3,4 @@ coveralls
 PyYAML
 toolz
 asciitree
+ccsyspath
