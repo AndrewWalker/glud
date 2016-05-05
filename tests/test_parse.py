@@ -1,4 +1,5 @@
 from . base_glud_test import *
+import os
 
 class SimpleParseTest(BaseGludTest):
 
@@ -7,12 +8,12 @@ class SimpleParseTest(BaseGludTest):
         void f()
         '''
         with self.assertRaises(ClangDiagnosticException) as ctx:
-            c = self._parse(s)
+            c = self.parse(s)
         str(ctx.exception)
 
     def test_bad_file_parse(self):
         open('fake.cpp','w').close()
-        c = self._parse_file('fake.cpp')
+        c = self.parse_file('fake.cpp')
         os.unlink('fake.cpp')
         
 

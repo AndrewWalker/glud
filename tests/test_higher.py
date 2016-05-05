@@ -1,5 +1,7 @@
 from . base_glud_test import *
-
+from clang.cindex import *
+from toolz import count
+from itertools import imap
 
 class HigherOrderFuncTests(BaseGludTest):
 
@@ -7,9 +9,9 @@ class HigherOrderFuncTests(BaseGludTest):
         s = '''
         #include <vector>
         '''
-        tu = self._parse_tu(s, options=TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
+        tu = self.parse_tu(s, options=TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
         incs = glud.includes('tmp.cpp', tu)
-        self.assertTrue(toolz.count(incs) > 0)
+        self.assertTrue(count(incs) > 0)
 
     def test_is_subclassof(self):
         s = '''
@@ -27,7 +29,7 @@ class HigherOrderFuncTests(BaseGludTest):
         def superclassof(fmatch, cursor):
             return any(imap(fmatch, superclasses([is_public], cursor)))
 
-        root = self._parse(s)
+        root = self.parse(s)
         it = glud.walk(is_class_definition, root)
         d = {}
         for cursor in it:
@@ -47,7 +49,7 @@ class HigherOrderFuncTests(BaseGludTest):
         class Bar : public Foo {};
         class Baz : public Bar {};
         '''
-        root = self._parse(s)
+        root = self.parse(s)
         classes = glud.walk(all_fn([is_class_definition, name_match('Baz')]), root)
         classes = list(classes)
         baz = classes[0]
