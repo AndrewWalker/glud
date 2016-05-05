@@ -9,7 +9,9 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -y python-clang-3.7 libclang1-3.7
     - ln -s /usr/lib/python2.7/dist-packages/clang
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/llvm-3.7/lib/
+    - sudo ln -s /usr/lib/llvm-3.7/lib/libclang-3.7.so.1 /usr/local/lib/libclang-3.7.so
+    - sudo ln -s /usr/lib/llvm-3.7/lib/libclang.so.1 /usr/local/lib/libclang.so
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     - pip install -r requirements.txt
 script:
     - coverage run setup.py test
