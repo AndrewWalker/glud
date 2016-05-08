@@ -5,24 +5,30 @@ Glud
 Overview
 ========
 
-|license| |build| |coverage|
 
 Glud is an abstraction on the libclang library that make matching fragments of
-the clang AST simple and Pythonic, in the same way that `libclangastmatchers`_
-does for the c++ clang API. 
+the Clang AST simple and Pythonic, in the same way that `libclangastmatchers`_
+does for the C++ Clang API. 
 
-This project is in no way affiliated with the LLVM Team or the University of
-Illinois at Urbana-Champaign.
+|license| |build| |coverage|
 
 
 Installing
 ==========
 
-Install a recent version of clang and the clang-python bindings, then install
-this module as per normal.
+Install a recent version of Clang and the python libclang bindings, then
+install this module as per normal.
 
 To run glud, you'll need to make sure that libclang.so / libclang.dylib is on
 your loader path.
+
+
+Acknowledgements
+================
+
+This project is in no way affiliated with the LLVM Team or the University of
+Illinois at Urbana-Champaign.
+
 
 
 .. _libclangastmatchers: http://clang.llvm.org/docs/LibASTMatchersReference.html
