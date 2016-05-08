@@ -71,7 +71,8 @@ def is_private(c):
     return has_access(clang.cindex.AccessSpecifier.PRIVATE, c)
 
 def is_definition(c):
-    return c.location == c.get_definition().location 
+    defn = c.get_definition()
+    return (defn is not None) and (c.location == defn.location)
 
 @toolz.curry
 def typename_match(pattern, cursor):
