@@ -10,17 +10,16 @@ def read(filename):
 
 setup(
     name         = "glud",
-    version      = "0.0.3",
-    description  = "Tools for matching nodes in the clang AST",
+    version      = "0.1.0",
+    description  = "Functional tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
     author       = "Andrew Walker",
     author_email = "walker.ab@gmail.com",
     url          = "http://github.com/AndrewWalker/glud",
     license      = "MIT",
-    zip_safe     = False,
-    packages     = {'glud', 'glud'}, 
-        classifiers  = [
-        'Development Status :: 2 - Pre-Alpha',
+    packages     = find_packages(), 
+    classifiers  = [
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
