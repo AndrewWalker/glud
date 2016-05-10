@@ -16,7 +16,9 @@ before_install:
     - sudo ln -s /usr/bin/clang++-3.8 /usr/local/bin/clang++
     - export PATH=/usr/local/bin:$PATH
     - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+install:
     - pip install -r requirements.txt
+    - python setup.py install
 script:
     - coverage run setup.py test
     - coverage report --show-missing
