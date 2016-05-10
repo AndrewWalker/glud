@@ -14,8 +14,8 @@ before_install:
     - sudo ln -s /usr/bin/llvm-config-3.8 /usr/local/bin/llvm-config
     - sudo ln -s /usr/bin/clang-3.8 /usr/local/bin/clang
     - sudo ln -s /usr/bin/clang++-3.8 /usr/local/bin/clang++
-    - export PATH=/usr/local/bin:$PATH
-    - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    - export PATH=$PATH:/usr/local/bin
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 install:
     - pip install -r requirements.txt
     - python setup.py install
