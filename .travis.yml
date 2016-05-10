@@ -5,13 +5,17 @@ python:
     - "2.7"
 before_install:
     - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-    - echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.7 main" | sudo tee -a /etc/apt/sources.list
+    - echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main" | sudo tee -a /etc/apt/sources.list
     - sudo apt-get update -qq
-    - sudo apt-get install -y python-clang-3.7 libclang1-3.7
+    - sudo apt-get install -y python-clang-3.8 libclang1-3.8
     - ln -s /usr/lib/python2.7/dist-packages/clang
-    - sudo ln -s /usr/lib/llvm-3.7/lib/libclang-3.7.so.1 /usr/local/lib/libclang-3.7.so
-    - sudo ln -s /usr/lib/llvm-3.7/lib/libclang.so.1 /usr/local/lib/libclang.so
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+    - sudo ln -s /usr/lib/llvm-3.8/lib/libclang-3.8.so.1 /usr/local/lib/libclang-3.8.so
+    - sudo ln -s /usr/lib/llvm-3.8/lib/libclang.so.1 /usr/local/lib/libclang.so
+    - sudo ln -s /usr/bin/llvm-config-3.8 /usr/local/bin/llvm-config
+    - sudo ln -s /usr/bin/clang-3.8 /usr/local/bin/clang
+    - sudo ln -s /usr/bin/clang++-3.8 /usr/local/bin/clang++
+    - export PATH=/usr/local/bin:$PATH
+    - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
     - pip install -r requirements.txt
 script:
     - coverage run setup.py test

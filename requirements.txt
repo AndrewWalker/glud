@@ -1,6 +1,5 @@
 coverage
 coveralls
-PyYAML
 toolz
 asciitree
 ccsyspath

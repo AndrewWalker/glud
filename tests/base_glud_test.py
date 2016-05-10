@@ -1,5 +1,6 @@
 import unittest2 as unittest
 import ccsyspath
+import subprocess
 import glud
 from glud import *
 
@@ -7,8 +8,12 @@ class BaseGludTest(unittest.TestCase):
 
     def setUp(self):
         syspath = ccsyspath.system_include_paths('clang++')
-        # TODO replaced with llvm-config invocation with appropriate flags
-        cargs = b'-x c++ --std=c++11 -DNDEBUG -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS'.split()
+        try:
+            cargs = subprocess.check_output('llvm-config --cppflags') 
+        except:
+            # if llvm-config isn't available, guess
+            cargs = '-x c++ --std=c++11'
+        cargs = cargs.split()
         cargs += [ b'-I' + inc for inc in syspath ]
         self.cargs = cargs
 
