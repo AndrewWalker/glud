@@ -1,6 +1,7 @@
 from . base_glud_test import *
 from clang.cindex import *
-from toolz import count
+from toolz import count 
+from itertools import ifilter
 
 class PredicateTests(BaseGludTest):
 
@@ -40,6 +41,20 @@ class PredicateTests(BaseGludTest):
         classes = glud.walk(is_class_definition, root)
         classes = list(classes)
         self.assertEquals(2, count(classes))
+
+    def test_named_match_pinned_at_end(self):
+        s = '''
+        void f();
+        void f1();
+        void f10();
+        '''
+        root = self.parse(s)
+        funcs = glud.walk(is_function, root)
+        funcs = ifilter(name_match('f'), funcs)
+        funcs = list(funcs)
+        self.assertEquals(1, count(funcs))
+        self.assertEquals(bool, type(name_match('f', funcs[0])))
+
 
     def test_find_class_with_named_method(self):
         s = '''
@@ -145,7 +160,7 @@ class PredicateTests(BaseGludTest):
         void f();
         '''
         root = self.parse(s)
-        fs = glud.walk(is_func, root)
+        fs = glud.walk(is_function, root)
         self.assertEquals(1, count(fs))
 
     def test_typename_match(self):

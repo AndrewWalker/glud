@@ -26,14 +26,14 @@ class HigherOrderFuncTests(BaseGludTest):
             class Fal {};
         }
         '''
-        def superclassof(fmatch, cursor):
+        def subclassof(fmatch, cursor):
             return any(imap(fmatch, superclasses([is_public], cursor)))
 
         root = self.parse(s)
         it = glud.walk(is_class_definition, root)
         d = {}
         for cursor in it:
-            d[cursor.type.spelling] = superclassof(name_match('Foo'), cursor)
+            d[cursor.type.spelling] = subclassof(name_match('Foo'), cursor)
         self.assertTrue(d['Bar'])
         self.assertTrue(d['Baz'])
         self.assertTrue(d['Biz'])

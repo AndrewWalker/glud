@@ -10,7 +10,7 @@ def read(filename):
 
 setup(
     name         = "glud",
-    version      = "0.1.0",
+    version      = "0.2.0",
     description  = "Functional tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
     author       = "Andrew Walker",

@@ -40,7 +40,7 @@ def is_kind(kind, c):
 def has_access(access, c):
     return c.access_specifier == access
 
-def is_func(n):
+def is_function(n):
     return is_kind(CursorKind.FUNCTION_DECL, n)
 
 def is_enum(n):
@@ -76,11 +76,11 @@ def is_definition(c):
 
 @toolz.curry
 def typename_match(pattern, cursor):
-    return re.match(pattern, cursor.type.spelling)
+    return re.match(pattern + '$', cursor.type.spelling) is not None
 
 @toolz.curry
 def name_match(pattern, cursor):
-    return re.match(pattern, cursor.spelling)
+    return re.match(pattern + '$', cursor.spelling) is not None
 
 @toolz.curry
 def is_in_file(files, c):
