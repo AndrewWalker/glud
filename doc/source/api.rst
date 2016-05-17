@@ -11,7 +11,6 @@ Predicates
    has_location
    is_base_specifier
    is_class
-   is_class_definition
    is_definition
    is_enum
    is_function
@@ -24,6 +23,13 @@ Predicates
    is_protected
    is_public
    is_translation_unit
-   name_match
-   typename_match
+   match_name
+   match_typename
 
+
+Definitions
+-----------
+
+.. automodule:: glud.predicates
+   :members:
+   :undoc-members:

@@ -33,7 +33,7 @@ class HigherOrderFuncTests(BaseGludTest):
         it = glud.walk(is_class_definition, root)
         d = {}
         for cursor in it:
-            d[cursor.type.spelling] = subclassof(name_match('Foo'), cursor)
+            d[cursor.type.spelling] = subclassof(match_name('Foo'), cursor)
         self.assertTrue(d['Bar'])
         self.assertTrue(d['Baz'])
         self.assertTrue(d['Biz'])
@@ -50,7 +50,7 @@ class HigherOrderFuncTests(BaseGludTest):
         class Baz : public Bar {};
         '''
         root = self.parse(s)
-        classes = glud.walk(all_fn([is_class_definition, name_match('Baz')]), root)
+        classes = glud.walk(all_fn([is_class_definition, match_name('Baz')]), root)
         classes = list(classes)
         baz = classes[0]
         baz_super = direct_superclasses([is_public], baz)

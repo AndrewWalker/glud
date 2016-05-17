@@ -50,10 +50,10 @@ class PredicateTests(BaseGludTest):
         '''
         root = self.parse(s)
         funcs = glud.walk(is_function, root)
-        funcs = ifilter(name_match('f'), funcs)
+        funcs = ifilter(match_name('f'), funcs)
         funcs = list(funcs)
         self.assertEquals(1, count(funcs))
-        self.assertEquals(bool, type(name_match('f', funcs[0])))
+        self.assertEquals(bool, type(match_name('f', funcs[0])))
 
 
     def test_find_class_with_named_method(self):
@@ -80,7 +80,7 @@ class PredicateTests(BaseGludTest):
             any_child(all_fn([
                 is_public,
                 is_method,
-                name_match('f')
+                match_name('f')
             ]))
         ])
         classes = glud.walk(f, root)
@@ -123,7 +123,7 @@ class PredicateTests(BaseGludTest):
         f = all_fn([
             is_in_file(set(['tmp.cpp'])),
             is_method,
-            name_match('f'),
+            match_name('f'),
         ])
         ms = list(glud.walk(f, root))
         self.assert_(is_primitive(ms[0].result_type))
@@ -163,7 +163,7 @@ class PredicateTests(BaseGludTest):
         fs = glud.walk(is_function, root)
         self.assertEquals(1, count(fs))
 
-    def test_typename_match(self):
+    def test_typematch_name(self):
         s = '''
         class foo;
         namespace bar {
@@ -171,7 +171,7 @@ class PredicateTests(BaseGludTest):
         }
         '''
         root = self.parse(s)
-        fs = glud.walk(typename_match('bar::foo'), root)
+        fs = glud.walk(match_typename('bar::foo'), root)
         self.assertEquals(1, count(fs))
 
     def test_any_predecessor(self):
@@ -184,7 +184,7 @@ class PredicateTests(BaseGludTest):
         }
         '''
         root = self.parse(s)
-        f = any_predecessor(lambda c : c.semantic_parent, name_match('bar'))
+        f = any_predecessor(lambda c : c.semantic_parent, match_name('bar'))
         classes = glud.walk(all_fn([is_class, f]), root)
         self.assertEquals(1, count(classes))
 
@@ -241,7 +241,7 @@ class PredicateTests(BaseGludTest):
                 is_translation_unit,
                 all_fn([
                     is_namespace,
-                    name_match('foo')
+                    match_name('foo')
                 ])
             ])
         )
