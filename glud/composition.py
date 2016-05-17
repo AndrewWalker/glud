@@ -7,13 +7,18 @@ from clang.cindex import *
 
 
 
-def walk(pred, cursor):
-    """Recursively yield all descendant nodes in the tree"""
-    return ifilter(pred, cursor.walk_preorder())
+def walk(predicate, cursor):
+    """Recursively yield all descendant nodes in the tree
+
+    >>> for cursor in walk(toolz.identity, tu.cursor):
+    >>>    print cursor.kind
+    """
+    return ifilter(predicate, cursor.walk_preorder())
 
 @toolz.curry
 def iter_child_nodes(pred, cursor):
-    """Yield all direct child nodes of node"""
+    """Yield all direct child nodes of node
+    """
     return ifilter(pred, cursor.get_children())
 
 @toolz.curry

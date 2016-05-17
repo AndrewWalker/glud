@@ -38,8 +38,7 @@ def is_primitive(n):
     """
     return n.kind in __primitive_types
 
-@toolz.curry
-def has_access(access, c):
+def has_access(access, cursor=None):
     """ Test if a cursor has a access specifier
 
     >>> has_access(clang.cindex.AccessSpecifier.PUBLIC, c)
@@ -50,27 +49,32 @@ def has_access(access, c):
         is_protected
         is_private
     """
-    return c.access_specifier == access
+    def has_access_curried(c):
+        """ Test if a cursor has a access specifier
+        """
+        return c.access_specifier == access
 
-def is_public(c):
+    if cursor is None:
+        return has_access_curried
+    else:
+        return has_access_curried(cursor)
+
+def is_public(cursor):
     """ Test if a cursor is public
     """
-    return has_access(clang.cindex.AccessSpecifier.PUBLIC, c)
+    return has_access(clang.cindex.AccessSpecifier.PUBLIC, cursor)
 
-def is_protected(c):
+def is_protected(cursor):
     """ Test if a cursor is protected
     """
-    return has_access(clang.cindex.AccessSpecifier.PROTECTED, c)
+    return has_access(clang.cindex.AccessSpecifier.PROTECTED, cursor)
 
-def is_private(c):
+def is_private(cursor):
     """ Test if a cursor is private
     """
-    return has_access(clang.cindex.AccessSpecifier.PRIVATE, c)
+    return has_access(clang.cindex.AccessSpecifier.PRIVATE, cursor)
 
-
-
-@toolz.curry
-def is_kind(kind, c):
+def is_kind(kind, cursor=None):
     """ Test if a cursor or type is of a particular kind
 
     >>> is_kind(CursorKind.CLASS_DECL, c)
@@ -81,7 +85,15 @@ def is_kind(kind, c):
     >>> is_kind(CursorKind.CLASS_DECL)(c)
     False
     """
-    return c.kind == kind
+    def is_kind_curried(c):
+        """ Test if a cursor or type is of a particular kind
+        """
+        return c.kind == kind
+
+    if cursor is None:
+        return is_kind_curried 
+    else:
+        return is_kind_curried(cursor)
 
 def is_function(cursor):
     """ Test if a cursor refers to a function declaration
@@ -94,12 +106,12 @@ def is_enum(cursor):
     return is_kind(CursorKind.ENUM_DECL, cursor)
 
 def is_class(cursor):
-    """ Test if a cursor refers to an class declaration
+    """ Test if a cursor refers to a class declaration
     """ 
     return is_kind(CursorKind.CLASS_DECL, cursor)
 
 def is_base_specifier(cursor):
-    """ Test if a cursor refers to an base-declaration
+    """ Test if a cursor refers to a base-declaration
     """ 
     return is_kind(CursorKind.CXX_BASE_SPECIFIER, cursor)
 
@@ -150,11 +162,11 @@ def is_in_file(files, cursor):
         pass
     return False
 
-def has_location(c):
+def has_location(cursor):
     """ Test if the cursor is in a file
     """
     try:
-        name = c.location.file.name 
+        name = cursor.location.file.name 
         return True
     except:
         pass

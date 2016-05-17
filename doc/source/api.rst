@@ -1,8 +1,22 @@
 API
 ===
 
+Composition
+-----------
+
+Traverse the libclang generate AST using semantics similar to the python ast
+module.
+
+.. currentmodule:: glud.composition
+
+.. autosummary::
+   walk
+   iter_child_nodes
+
 Predicates
 ----------
+
+Common tests for cursors and types. 
 
 .. currentmodule:: glud.predicates
 
@@ -31,5 +45,9 @@ Definitions
 -----------
 
 .. automodule:: glud.predicates
+   :members:
+   :undoc-members:
+
+.. automodule:: glud.composition
    :members:
    :undoc-members:
