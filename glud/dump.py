@@ -18,7 +18,7 @@ def dump(cursor, predicate=None):
 
     def print_node(node):
         text = node.spelling or node.displayname
-        kind = node.split(b'.')[1]
+        kind = str(node.kind).split(b'.')[1]
         return '{} {}'.format(kind, text)
 
     return asciitree.draw_tree(cursor, node_children, print_node)

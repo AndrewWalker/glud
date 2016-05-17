@@ -1,4 +1,5 @@
 from . base_glud_test import *
+import clang.cindex
 from clang.cindex import *
 from toolz import count 
 from itertools import ifilter
@@ -85,6 +86,12 @@ class PredicateTests(BaseGludTest):
         ])
         classes = glud.walk(f, root)
         self.assertEquals(2, count(classes))
+
+    def test_has_access_curried(self):
+        c = self.parse('class foo{};')
+        # curry function
+        f = has_access(clang.cindex.AccessSpecifier.PROTECTED)
+        walk(f, c)
 
     def test_enums_types(self):
         s = '''
