@@ -2,6 +2,9 @@ import clang.cindex
 import os
 
 class ClangDiagnosticException(Exception):
+    """Encapsulates Clang diagnostics as an exception
+    """
+
     def __init__(self, diagnostic):
         self.diagnostic = diagnostic
 
@@ -17,11 +20,15 @@ def _ensure_parse_valid(tu):
     return tu        
 
 def parse_string(contents, name='tmp.cpp', **kwargs):
+    """ Parse a string of C/C++ code
+    """
     idx = clang.cindex.Index.create()
     tu = idx.parse(name, unsaved_files=[(name, contents)], **kwargs)
     return _ensure_parse_valid(tu)
 
 def parse(name, **kwargs):
+    """ Parse a C/C++ file
+    """
     idx = clang.cindex.Index.create()
     assert os.path.exists(name)
     tu = idx.parse(name, **kwargs)

@@ -4,14 +4,16 @@ import toolz
 import toolz.curried
 import clang.cindex
 from clang.cindex import *
+import functools
 
-
-
+@functools.partial
 def walk(predicate, cursor):
     """Recursively yield all descendant nodes in the tree
 
-    >>> for cursor in walk(toolz.identity, tu.cursor):
-    >>>    print cursor.kind
+    Find all (non-template) classes 
+
+    >>> tu = parse_string('class foo {};')
+    >>> walk(is_class, tu.cursor)
     """
     return ifilter(predicate, cursor.walk_preorder())
 

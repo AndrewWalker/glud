@@ -1,6 +1,19 @@
 API
 ===
 
+Parse
+-----
+
+Simplify the parsing of C/C++ using libclang.  This module specifically
+supports the use case of single translation units where it isn't important that
+symbols from other translation units would be visible.
+
+.. currentmodule:: glud.parse
+
+.. autosummary::
+   parse
+   parse_string 
+
 Composition
 -----------
 
@@ -12,6 +25,18 @@ module.
 .. autosummary::
    walk
    iter_child_nodes
+
+
+AST Pretty Printing
+-------------------
+
+Display the libclang AST, or a filtered subset of  
+
+.. currentmodule:: glud.dump
+
+.. autosummary::
+   dump
+
 
 Predicates
 ----------
@@ -40,9 +65,26 @@ Common tests for cursors and types.
    match_name
    match_typename
 
+Higher Level Abstractions
+-------------------------
+
+Examples of the types of abstractions that it is possible to
+compose with glud
+
+.. currentmodule:: glud.higher
+
+.. autosummary::
+   is_class_definition
+   superclasses
+   direct_superclasses
+   includes
+
 
 Definitions
 -----------
+
+.. automodule:: glud.parse
+   :members:
 
 .. automodule:: glud.predicates
    :members:
@@ -51,3 +93,9 @@ Definitions
 .. automodule:: glud.composition
    :members:
    :undoc-members:
+
+.. automodule:: glud.higher
+   :members:
+
+.. automodule:: glud.dump
+   :members:

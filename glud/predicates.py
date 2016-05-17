@@ -2,6 +2,7 @@ import clang.cindex
 from clang.cindex import *
 import re
 import toolz
+import functools
 
 
 __primitive_types = set([
@@ -49,15 +50,10 @@ def has_access(access, cursor=None):
         is_protected
         is_private
     """
-    def has_access_curried(c):
-        """ Test if a cursor has a access specifier
-        """
-        return c.access_specifier == access
-
     if cursor is None:
-        return has_access_curried
+        return functools.partial(has_access, access)
     else:
-        return has_access_curried(cursor)
+        return cursor.access_specifier == access
 
 def is_public(cursor):
     """ Test if a cursor is public
@@ -85,15 +81,10 @@ def is_kind(kind, cursor=None):
     >>> is_kind(CursorKind.CLASS_DECL)(c)
     False
     """
-    def is_kind_curried(c):
-        """ Test if a cursor or type is of a particular kind
-        """
-        return c.kind == kind
-
     if cursor is None:
-        return is_kind_curried 
+        return functools.partial(is_kind, kind) 
     else:
-        return is_kind_curried(cursor)
+        return kind == cursor.kind
 
 def is_function(cursor):
     """ Test if a cursor refers to a function declaration
@@ -152,15 +143,17 @@ def match_name(pattern, cursor):
     """
     return re.match(pattern + '$', cursor.spelling) is not None
 
-@toolz.curry
-def is_in_file(files, cursor):
+def is_in_file(files, cursor=None):
     """ Test if the cursor location is in a set of files
     """
-    try:
-        return cursor.location.file.name in files
-    except:
-        pass
-    return False
+    if cursor is None:
+        return functools.partial(is_in_file, files)
+    else:
+        try:
+            return cursor.location.file.name in files
+        except:
+            pass
+        return False
 
 def has_location(cursor):
     """ Test if the cursor is in a file

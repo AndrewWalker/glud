@@ -10,7 +10,7 @@ def read(filename):
 
 setup(
     name         = "glud",
-    version      = "0.2.1",
+    version      = "0.3.0",
     install_requires = [
         'toolz',
         'asciitree',

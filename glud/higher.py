@@ -6,6 +6,10 @@ from .composition import *
 
 @toolz.curry
 def includes(filename, tu):
+    """ Yield of the preprocess include directories in a translation unit
+
+    This function requires that
+    """
     filt = all_fn([
         is_kind(CursorKind.INCLUSION_DIRECTIVE),
         is_in_file(filename)
