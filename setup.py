@@ -1,5 +1,16 @@
 from setuptools import setup, find_packages
+import re
+import io
 import os
+
+
+def read_version():
+    with io.open('./glud/version.py', encoding='utf8') as version_file:
+        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file.read(), re.M)
+        if version_match:
+            version = version_match.group(1)
+        else:
+            raise RuntimeError("Unable to find version string.")
 
 
 def read(filename):
@@ -10,7 +21,7 @@ def read(filename):
 
 setup(
     name         = "glud",
-    version      = "0.3.0",
+    version      = read_version(),
     install_requires = [
         'toolz',
         'asciitree',

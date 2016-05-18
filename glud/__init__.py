@@ -3,6 +3,7 @@ from .parse import *
 from .dump import *
 from .higher import *
 from .predicates import *
+from .version import __version__
 
 __all__ = ('walk', 'iter_child_nodes', 'iter_predecessors', 'any_fn',
            'all_fn', 'complement', 'any_child', 'all_children',
@@ -13,4 +14,3 @@ __all__ = ('walk', 'iter_child_nodes', 'iter_predecessors', 'any_fn',
            'is_namespace', 'is_public', 'is_protected', 'is_private', 'is_definition',
            'match_typename', 'match_name', 'is_in_file', 'has_location')
 
-__version__ = '0.3.0'
