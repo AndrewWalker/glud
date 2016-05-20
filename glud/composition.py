@@ -1,6 +1,6 @@
 import re
-from itertools import ifilter, imap
 import toolz
+from toolz import filter, map
 import toolz.curried
 import clang.cindex
 from clang.cindex import *
@@ -15,13 +15,13 @@ def walk(predicate, cursor):
     >>> tu = parse_string('class foo {};')
     >>> walk(is_class, tu.cursor)
     """
-    return ifilter(predicate, cursor.walk_preorder())
+    return filter(predicate, cursor.walk_preorder())
 
 @toolz.curry
 def iter_child_nodes(pred, cursor):
     """Yield all direct child nodes of node
     """
-    return ifilter(pred, cursor.get_children())
+    return filter(pred, cursor.get_children())
 
 @toolz.curry
 def iter_predecessors(func, cursor):

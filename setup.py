@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 import re
 import io
 import os
+import sys
 
 
 def read_version():
@@ -18,15 +19,19 @@ def read(filename):
     contents = open(path).read()
     return contents
 
+requires = [
+    'toolz',
+    'asciitree',
+    'ccsyspath',
+]
+
+requires =  ['clang'] if sys.version_info[1] == 2 else []
+requires += ['ibclang-py3'] if sys.version_info[1] == 3 else []
+
 
 setup(
     name         = "glud",
     version      = read_version(),
-    install_requires = [
-        'toolz',
-        'asciitree',
-        'ccsyspath',
-    ],
     description  = "Functional tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
     author       = "Andrew Walker",
@@ -40,10 +45,14 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Operating System :: POSIX :: Linux',
-        'Topic :: Software Development :: Code Generators',
+        'Topic :: Software Development :: Compilers'
     ],
-    tests_require=['unittest2'],
-    test_suite='unittest2.collector'
 )
 
