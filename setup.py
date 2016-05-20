@@ -11,7 +11,7 @@ def read_version():
             version = version_match.group(1)
         else:
             raise RuntimeError("Unable to find version string.")
-
+    return version
 
 def read(filename):
     path = os.path.join(os.path.dirname(__file__), filename)

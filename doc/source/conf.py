@@ -66,7 +66,7 @@ def read_version():
             version = version_match.group(1)
         else:
             raise RuntimeError("Unable to find version string.")
-
+    return version
 
 
 version = read_version()
