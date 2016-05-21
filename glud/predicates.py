@@ -128,8 +128,7 @@ def match_name(pattern, cursor):
     return re.match(pattern + '$', cursor.spelling) is not None
 
 @toolz.curry
-def match_name(pattern, cursor):
-def is_in_file(files, cursor=None):
+def is_in_file(files, cursor):
     """ Test if the cursor location is in a set of files
     """
     try:
