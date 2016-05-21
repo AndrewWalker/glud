@@ -8,7 +8,7 @@ Simplify the parsing of C/C++ using libclang.  This module specifically
 supports the use case of single translation units where it isn't important that
 symbols from other translation units would be visible.
 
-.. currentmodule:: glud.parse
+.. currentmodule:: glud.parsing
 
 .. autosummary::
    parse
@@ -32,7 +32,7 @@ AST Pretty Printing
 
 Display the libclang AST, or a filtered subset of  
 
-.. currentmodule:: glud.dump
+.. currentmodule:: glud.display
 
 .. autosummary::
    dump
@@ -83,7 +83,7 @@ compose with glud
 Definitions
 -----------
 
-.. automodule:: glud.parse
+.. automodule:: glud.parsing
    :members:
 
 .. automodule:: glud.predicates
@@ -97,5 +97,5 @@ Definitions
 .. automodule:: glud.higher
    :members:
 
-.. automodule:: glud.dump
+.. automodule:: glud.display
    :members:

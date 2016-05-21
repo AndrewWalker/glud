@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest
 import ccsyspath
 import subprocess
 import glud
@@ -14,7 +14,7 @@ class BaseGludTest(unittest.TestCase):
             # if llvm-config isn't available, guess
             cargs = '-x c++ --std=c++11'
         cargs = cargs.split()
-        cargs += [ b'-I' + inc for inc in syspath ]
+        cargs += [ '-I' + inc for inc in syspath ]
         self.cargs = cargs
 
     def parse_file(self, s, *args, **kwargs):

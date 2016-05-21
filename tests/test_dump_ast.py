@@ -8,11 +8,13 @@ class DumpAST_Tests(BaseGludTest):
         void f();
         '''
         root = self.parse(s)
-        self.assertEquals(str, type(dump(root)))
+        dmp = glud.dump(root)
+        self.assertEquals(str, type(dmp))
 
     def test_empty_dump(self):
         s = ''
         root = self.parse(s)
-        self.assertEquals(str, type(glud.dump(root)))
+        dmp = glud.dump(root)
+        self.assertEquals(str, type(dmp))
 
 

@@ -1,7 +1,6 @@
 from . base_glud_test import *
 from clang.cindex import *
-from toolz import count
-from itertools import imap
+from toolz import count, map
 
 class HigherOrderFuncTests(BaseGludTest):
 
@@ -27,7 +26,7 @@ class HigherOrderFuncTests(BaseGludTest):
         }
         '''
         def subclassof(fmatch, cursor):
-            return any(imap(fmatch, superclasses([is_public], cursor)))
+            return any(map(fmatch, superclasses([is_public], cursor)))
 
         root = self.parse(s)
         it = glud.walk(is_class_definition, root)
