@@ -25,7 +25,7 @@ requires = [
     'ccsyspath',
 ]
 
-if sys.version_info[1] == 2:
+if sys.version_info.major == 2:
     requires += ['clang'] 
 else: 
     requires += ['libclang-py3'] 
@@ -55,5 +55,6 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Operating System :: POSIX :: Linux',
-    ]
+    ],
+    test_suite='tests'
 )

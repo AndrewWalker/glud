@@ -6,3 +6,4 @@ build
 htmlcov
 dist
 doc/build
+.eggs
