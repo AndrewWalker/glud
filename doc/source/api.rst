@@ -25,6 +25,13 @@ module.
 .. autosummary::
    walk
    iter_child_nodes
+   iter_predecessors
+   any_fn
+   all_fn
+   any_child
+   all_children
+   any_predecessor
+   all_predecessors  
 
 
 AST Pretty Printing
