@@ -33,27 +33,18 @@ __primitive_types = set([
 
 def is_primitive(n):
     """ Test if a type is a simple types (integer, boolean, char, float)
-
-    >>> is_primitive(t)
-    True
     """
     return n.kind in __primitive_types
 
-def has_access(access, cursor=None):
+@toolz.curry
+def has_access(access, cursor):
     """ Test if a cursor has a access specifier
-
-    >>> has_access(clang.cindex.AccessSpecifier.PUBLIC, c)
-    True
-
     See Also:
         is_public
         is_protected
         is_private
     """
-    if cursor is None:
-        return functools.partial(has_access, access)
-    else:
-        return cursor.access_specifier == access
+    return cursor.access_specifier == access
 
 def is_public(cursor):
     """ Test if a cursor is public
@@ -70,21 +61,11 @@ def is_private(cursor):
     """
     return has_access(clang.cindex.AccessSpecifier.PRIVATE, cursor)
 
-def is_kind(kind, cursor=None):
+@toolz.curry
+def is_kind(kind, cursor):
     """ Test if a cursor or type is of a particular kind
-
-    >>> is_kind(CursorKind.CLASS_DECL, c)
-    False
-
-    Curry the kind argument
-
-    >>> is_kind(CursorKind.CLASS_DECL)(c)
-    False
     """
-    if cursor is None:
-        return functools.partial(is_kind, kind) 
-    else:
-        return kind == cursor.kind
+    return kind == cursor.kind
 
 def is_function(cursor):
     """ Test if a cursor refers to a function declaration
@@ -135,7 +116,10 @@ def is_definition(cursor):
 def match_typename(pattern, cursor):
     """ Test if the spelling of the type refered to by the cursor matches a regular expression
     """
-    return re.match(pattern + '$', cursor.type.spelling) is not None
+    typename = cursor.type.spelling
+    if type(typename) is not str:
+        return False
+    return re.match(pattern + '$', typename) is not None
 
 @toolz.curry
 def match_name(pattern, cursor):

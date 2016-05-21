@@ -11,9 +11,6 @@ def walk(predicate, cursor):
     """Recursively yield all descendant nodes in the tree
 
     Find all (non-template) classes 
-
-    >>> tu = parse_string('class foo {};')
-    >>> walk(is_class, tu.cursor)
     """
     return filter(predicate, cursor.walk_preorder())
 
@@ -51,24 +48,24 @@ complement = toolz.curried.complement
 def any_child(predicate, cursor):
     """(cursor -> bool) -> cursor -> bool"""
     it = cursor.get_children()
-    return any(imap(predicate, it))
+    return any(map(predicate, it))
 
 @toolz.curry
 def all_children(predicate, cursor):
     """(cursor -> bool) -> cursor -> bool"""
     it = cursor.get_children()
-    return all(imap(predicate, it))
+    return all(map(predicate, it))
 
 @toolz.curry
 def any_predecessor(f, predicate, cursor):
     """(cursor -> cursor) -> (cursor -> bool) -> cursor -> bool"""
     it = iter_predecessors(f, cursor)
-    return any(imap(predicate, it))
+    return any(map(predicate, it))
 
 @toolz.curry
 def all_predecessors(f, predicate, cursor):
     """(cursor -> cursor) -> (cursor -> bool) -> cursor -> bool"""
     it = iter_predecessors(f, cursor)
-    return all(imap(predicate, it))
+    return all(map(predicate, it))
 
 
