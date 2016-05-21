@@ -2,7 +2,6 @@ import clang.cindex
 from clang.cindex import *
 import re
 import toolz
-import functools
 
 
 __primitive_types = set([
@@ -116,6 +115,7 @@ def is_definition(cursor):
 def match_typename(pattern, cursor):
     """ Test if the spelling of the type refered to by the cursor matches a regular expression
     """
+    # this test works around a regression in libclang_py3 786b965
     typename = cursor.type.spelling
     if type(typename) is not str:
         return False
@@ -127,17 +127,16 @@ def match_name(pattern, cursor):
     """
     return re.match(pattern + '$', cursor.spelling) is not None
 
+@toolz.curry
+def match_name(pattern, cursor):
 def is_in_file(files, cursor=None):
     """ Test if the cursor location is in a set of files
     """
-    if cursor is None:
-        return functools.partial(is_in_file, files)
-    else:
-        try:
-            return cursor.location.file.name in files
-        except:
-            pass
-        return False
+    try:
+        return cursor.location.file.name in files
+    except:
+        pass
+    return False
 
 def has_location(cursor):
     """ Test if the cursor is in a file

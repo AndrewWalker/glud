@@ -83,7 +83,7 @@ compose with glud
 Definitions
 -----------
 
-.. automodule:: glud.parse
+.. automodule:: glud.parsing
    :members:
 
 .. automodule:: glud.predicates
@@ -97,5 +97,5 @@ Definitions
 .. automodule:: glud.higher
    :members:
 
-.. automodule:: glud.dump
+.. automodule:: glud.display
    :members:

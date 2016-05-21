@@ -4,9 +4,9 @@ from toolz import filter, map
 import toolz.curried
 import clang.cindex
 from clang.cindex import *
-import functools
 
-@functools.partial
+
+@toolz.curry
 def walk(predicate, cursor):
     """Recursively yield all descendant nodes in the tree
 
