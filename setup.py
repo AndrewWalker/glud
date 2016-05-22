@@ -7,7 +7,7 @@ import sys
 
 def read_version():
     with io.open('./glud/version.py', encoding='utf8') as version_file:
-        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file.read(), re.m)
+        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file.read(), re.M)
         if version_match:
             version = version_match.group(1)
         else:
@@ -26,7 +26,8 @@ requires = [
 ]
 
 if sys.version_info.major == 2:
-    requires += ['clang'] 
+    #requires += ['clang'] 
+    pass
 else: 
     requires += ['libclang-py3'] 
 
@@ -36,6 +37,7 @@ setup(
     install_requires = requires,
     description  = "Functional tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
+    version      = read_version(),
     author       = "Andrew Walker",
     author_email = "walker.ab@gmail.com",
     url          = "http://github.com/AndrewWalker/glud",
