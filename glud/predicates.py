@@ -71,6 +71,16 @@ def is_function(cursor):
     """ 
     return is_kind(CursorKind.FUNCTION_DECL, cursor)
 
+def is_constructor(cursor):
+    """ Test if a cursor refers to a constructor
+    """
+    return is_kind(CursorKind.CONSTRUCTOR, cursor)
+
+def is_destructor(cursor):
+    """ Test if a cursor refers to a destructor
+    """
+    return is_kind(CursorKind.DESTRUCTOR, cursor)
+
 def is_enum(cursor):
     """ Test if a cursor refers to an enumeration declaration
     """ 
@@ -80,6 +90,12 @@ def is_class(cursor):
     """ Test if a cursor refers to a class declaration
     """ 
     return is_kind(CursorKind.CLASS_DECL, cursor)
+
+def is_template_class(cursor):
+    """ Test if a cursor refers to a class template
+    """ 
+    return is_kind(CursorKind.CLASS_TEMPLATE, cursor)
+    
 
 def is_base_specifier(cursor):
     """ Test if a cursor refers to a base-declaration
