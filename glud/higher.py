@@ -22,7 +22,10 @@ def direct_superclasses(predicates, cursor):
     """Yield all the recursive walk of the superclasses
     """
     filt = all_fn([is_base_specifier] + predicates)
-    return ( c.get_definition() for c in iter_child_nodes(filt, cursor) )
+    for c in iter_child_nodes(filt, cursor):
+        defn = c.get_definition() 
+        if defn is not None:
+            yield defn
 
 
 @toolz.curry

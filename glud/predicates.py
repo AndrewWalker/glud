@@ -76,6 +76,11 @@ def is_constructor(cursor):
     """
     return is_kind(CursorKind.CONSTRUCTOR, cursor)
 
+def is_typedef(cursor):
+    """ Test if a cursor refers to a constructor
+    """
+    return is_kind(CursorKind.TYPEDEF_DECL, cursor)
+
 def is_destructor(cursor):
     """ Test if a cursor refers to a destructor
     """
@@ -90,6 +95,11 @@ def is_class(cursor):
     """ Test if a cursor refers to a class declaration
     """ 
     return is_kind(CursorKind.CLASS_DECL, cursor)
+
+def is_struct(cursor):
+    """ Test if a cursor refers to a struct declaration
+    """ 
+    return is_kind(CursorKind.STRUCT_DECL, cursor)
 
 def is_template_class(cursor):
     """ Test if a cursor refers to a class template
