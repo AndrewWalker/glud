@@ -16,18 +16,11 @@ def read_version():
 
 def read(filename):
     path = os.path.join(os.path.dirname(__file__), filename)
-    contents = open(path).read()
-    return contents
-
-requires = [
-    'toolz',
-    'asciitree',
-    'ccsyspath',
-]
+    with io.open(path, encoding='utf8') as fh:
+        return fh.read() 
 
 if sys.version_info.major == 2:
-    #requires += ['clang'] 
-    pass
+    requires += ['clang'] 
 else: 
     requires += ['libclang-py3'] 
 
@@ -42,21 +35,24 @@ setup(
     author_email = "walker.ab@gmail.com",
     url          = "http://github.com/AndrewWalker/glud",
     license      = "MIT",
+    keywords     = [ 'libclang', 'clang', 'AST' ],
     packages     = find_packages(), 
     classifiers  = [
         'Topic :: Software Development :: Compilers',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers'
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Operating System :: POSIX :: Linux',
     ],
     test_suite='tests'
+    tests_require=[
+        'ccsyspath'
+    ],
 )

@@ -1,20 +1,29 @@
-import asciitree
+try:
+    from asciitree import draw_tree
+except:
+    from io import BytesIO
 
-def dump(cursor, predicate=None):
-    """Pretty print the tree of the AST represented by a cursor
+    def draw_tree(cursor, children, printer):
+        def impl(node, fh, depth=0):
+            fh.write('{} - {}\n'.format('  '*depth, printer(node)))
+            for c in children(node):
+                impl(c, fh, depth+1)
 
-    """
-    if predicate is None:
-        predicate = lambda c : True
+        fh = BytesIO()
+        impl(cursor, fh)
+        return fh.getvalue()
 
+
+
+def dump(cursor):
     def node_children(node):
         cs = node.get_children()
-        return [ c for c in cs if predicate(c) ]
+        return cs
 
     def print_node(node):
         text = node.spelling or node.displayname
         kind = str(node.kind).split('.')[1]
         return '{} {}'.format(kind, text)
 
-    return asciitree.draw_tree(cursor, node_children, print_node)
+    return draw_tree(cursor, node_children, print_node)
 

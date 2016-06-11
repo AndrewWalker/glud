@@ -1,5 +1,4 @@
 coverage
 coveralls
-toolz
 asciitree
 ccsyspath
