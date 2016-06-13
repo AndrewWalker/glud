@@ -1,4 +1,4 @@
 coverage
 coveralls
+nose
 asciitree
-ccsyspath

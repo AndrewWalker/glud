@@ -5,7 +5,7 @@ import re
 __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
-    'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher'
+    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher'
 ]
 
 
@@ -102,20 +102,29 @@ class AllOfTypeMatcher(object):
 
     def __call__(self, t):
         assert(t is not None)
-        assert(type(t) == clang.cindex.Type)
+        assert(type(t) == Type)
         return all(m(t) for m in self.matchers)
 
 
-class ReturnTypeTraversalMatcher(object):
+class TypeTraversalMatcher(object):
     def __init__(self, matcher):
         self.matcher = matcher
+
+    def traverse(self, cursor):
+        return cursor.type
 
     def __call__(self, cursor):
         assert(cursor is not None)
         assert(type(cursor) == Cursor)
-        assert(cursor.kind == CursorKind.CXX_METHOD)
-        res = self.matcher(cursor.result_type)
-        return res
+        return self.matcher(self.traverse(cursor))
+
+
+class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
+    def __init__(self, matcher):
+        super(ReturnTypeTraversalMatcher, self).__init__(matcher)
+
+    def traverse(self, cursor):
+        return cursor.result_type
 
     
 class AnyArgumentMatcher(object):
@@ -125,7 +134,6 @@ class AnyArgumentMatcher(object):
     def __call__(self, cursor):
         assert(cursor is not None)
         assert(type(cursor) == Cursor)
-        assert(cursor.kind == CursorKind.CXX_METHOD)
         for a in cursor.get_arguments():
             if self.matcher(a):
                 return True

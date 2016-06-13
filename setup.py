@@ -19,15 +19,16 @@ def read(filename):
     with io.open(path, encoding='utf8') as fh:
         return fh.read() 
 
-if sys.version_info.major == 2:
-    requires += ['clang'] 
-else: 
-    requires += ['libclang-py3'] 
+def requires():
+    if sys.version_info.major == 2:
+        return ['clang'] 
+    else: 
+        return ['libclang-py3'] 
 
 
 setup(
     name         = "glud",
-    install_requires = requires,
+    install_requires = requires(),
     description  = "Functional tools for matching nodes in the clang AST",
     long_description = read('README.rst'),
     version      = read_version(),
@@ -51,8 +52,5 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Operating System :: POSIX :: Linux',
     ],
-    test_suite='tests'
-    tests_require=[
-        'ccsyspath'
-    ],
+    test_suite='tests',
 )

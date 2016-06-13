@@ -1,4 +1,4 @@
-from . base_glud_test import *
+from .utils import *
 
 
 class DumpAST_Tests(BaseGludTest):

@@ -3,6 +3,7 @@ try:
 except:
     from io import BytesIO
 
+    # If asciitree isn't available, provide a minimal placeholder
     def draw_tree(cursor, children, printer):
         def impl(node, fh, depth=0):
             fh.write('{} - {}\n'.format('  '*depth, printer(node)))
@@ -17,8 +18,7 @@ except:
 
 def dump(cursor):
     def node_children(node):
-        cs = node.get_children()
-        return cs
+        return list(node.get_children())
 
     def print_node(node):
         text = node.spelling or node.displayname

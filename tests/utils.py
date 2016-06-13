@@ -1,20 +1,16 @@
 import unittest
-import ccsyspath
-import subprocess
 import glud
-from glud import *
+
+
+def count(iterable):
+    return sum(1 for _ in iterable)
+
 
 class BaseGludTest(unittest.TestCase):
 
     def setUp(self):
-        syspath = ccsyspath.system_include_paths('clang++')
-        try:
-            cargs = subprocess.check_output('llvm-config --cppflags') 
-        except:
-            # if llvm-config isn't available, guess
-            cargs = '-x c++ --std=c++11'
+        cargs = '-x c++ --std=c++11'
         cargs = cargs.split()
-        cargs += [ '-I' + inc for inc in syspath ]
         self.cargs = cargs
 
     def parse_file(self, s, *args, **kwargs):

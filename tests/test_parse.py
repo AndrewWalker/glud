@@ -1,4 +1,6 @@
-from . base_glud_test import *
+from .utils import *
+from glud import ClangDiagnosticException
+import io
 import os
 
 class SimpleParseTest(BaseGludTest):
@@ -11,8 +13,9 @@ class SimpleParseTest(BaseGludTest):
             c = self.parse(s)
         str(ctx.exception)
 
-    def test_bad_file_parse(self):
-        open('fake.cpp','w').close()
+    def test_empty_file_parse(self):
+        with io.open('fake.cpp','w') as fh:
+            pass
         c = self.parse_file('fake.cpp')
         os.unlink('fake.cpp')
         

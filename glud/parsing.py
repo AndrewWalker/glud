@@ -1,6 +1,8 @@
 import clang.cindex
 import os
 
+__all__ = [ 'ClangDiagnosticException', 'parse_string', 'parse' ]
+
 class ClangDiagnosticException(Exception):
     """Encapsulates Clang diagnostics as an exception
     """
