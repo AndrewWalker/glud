@@ -344,7 +344,7 @@ def stmt(*args):
 
 
 def typedefDecl(*args):
-    """Inverts the match of the children
+    """Matches typedef declarations
 
     >>> from glud import *
     >>> config = '''

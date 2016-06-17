@@ -34,6 +34,14 @@ def is_builtin(n):
     return n.kind in __primitive_types
 
 
+def is_definition(n):
+    """Test if a cursor refers to a definition
+
+    This occurs when the cursor has a definition, and shares the location of that definiton
+    """
+    defn = cursor.get_definition()
+    return (defn is not None) and (cursor.location == defn.location)
+
 def has_access(access):
     """ Test if a cursor has a access specifier
     """
