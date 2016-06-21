@@ -34,7 +34,7 @@ def is_builtin(n):
     return n.kind in __primitive_types
 
 
-def is_definition(n):
+def is_definition(cursor):
     """Test if a cursor refers to a definition
 
     This occurs when the cursor has a definition, and shares the location of that definiton

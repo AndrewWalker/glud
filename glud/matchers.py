@@ -378,4 +378,5 @@ def unless(*args):
     return UnlessMatcher(*args)
 
 
-
+def isDefinition():
+    return Matcher(is_definition)
