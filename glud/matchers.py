@@ -380,3 +380,23 @@ def unless(*args):
 
 def isDefinition():
     return Matcher(is_definition)
+
+
+def hasAncestor(matcher):
+    """
+    >>> from glud import *
+    >>> config = '''
+    ... namespace X {
+    ...   class Y {};
+    ... }
+    ... class Z {};
+    ... '''
+    >>> m = cxxRecordDecl(
+    ...         hasName('Y'),
+    ...         hasAncestor(namespaceDecl(hasName('X'))))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print c.spelling
+    Y
+    """
+    return AncestorMatcher(matcher)

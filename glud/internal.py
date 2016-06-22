@@ -5,7 +5,8 @@ import re
 __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
-    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher'
+    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
+    'AncestorMatcher'
 ]
 
 
@@ -139,6 +140,21 @@ class AnyArgumentMatcher(object):
         for a in cursor.get_arguments():
             if self.matcher(a):
                 return True
+        return False
+
+
+class AncestorMatcher(Matcher):
+    def __init__(self, m):
+        super(AncestorMatcher, self).__init__(m)
+
+    def __call__(self, cursor):
+        assert(cursor is not None)
+        assert(type(cursor) == Cursor)
+        c = cursor
+        while c is not None:
+            if super(AncestorMatcher, self).__call__(c):
+                return True
+            c = c.semantic_parent
         return False
 
 
