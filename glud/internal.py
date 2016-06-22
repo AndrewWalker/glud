@@ -65,6 +65,8 @@ class AnyBaseClassMatcher(Matcher):
         for c in cursor.get_children():
             if c.kind == CursorKind.CXX_BASE_SPECIFIER:
                 cdef = c.get_definition()
+                if cdef is None:
+                    continue
                 if any(m(cdef) for m in self.matchers):
                     return True
                 elif self(cdef):
