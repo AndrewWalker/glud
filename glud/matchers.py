@@ -210,7 +210,7 @@ def hasName(name):
 
 
 def hasReturnType(matcher):
-    """Match an item has static storage duration
+    """Match a function/method with a specified return type
 
     >>> from glud import *
     >>> config = '''
