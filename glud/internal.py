@@ -6,7 +6,7 @@ __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
-    'AncestorMatcher'
+    'AncestorMatcher', 'TrueMatcher'
 ]
 
 
@@ -22,6 +22,16 @@ class Matcher(object):
         ms = (m(cursor) for m in self.matchers)
         return all(ms)
 
+
+class TrueMatcher(object):
+    """Matcher that always returns true
+    """
+
+    def __init__(self, *args):
+        super(TrueMatcher, self).__init__()
+
+    def __call__(self, cursor):
+        return True
     
 class UnlessMatcher(Matcher):
     def __init__(self, *args):

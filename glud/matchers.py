@@ -14,6 +14,10 @@ def hasType(matcher):
     return TypeTraversalMatcher(matcher)
 
 
+def anything():
+    return TrueMatcher()
+
+
 def anyArgument(matcher):
     """Match C++ class declarations 
 
@@ -25,7 +29,7 @@ def anyArgument(matcher):
     >>> m = functionDecl(anyArgument(hasType(builtinType())))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     g
     """
     return AnyArgumentMatcher(matcher)
@@ -46,7 +50,7 @@ def classTemplateDecl(*args):
     >>> m = classTemplateDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return Matcher(is_kind(CursorKind.CLASS_TEMPLATE), *args)
@@ -63,7 +67,7 @@ def cxxRecordDecl(*args):
     >>> m = cxxRecordDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     Y
     """
@@ -83,7 +87,7 @@ def cxxConstructorDecl(*args):
     >>> m = cxxConstructorDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return Matcher(is_kind(CursorKind.CONSTRUCTOR), *args)
@@ -102,7 +106,7 @@ def cxxDestructorDecl(*args):
     >>> m = cxxDestructorDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     ~X
     """
     return Matcher(is_kind(CursorKind.DESTRUCTOR), *args)
@@ -121,7 +125,7 @@ def cxxMethodDecl(*args):
     >>> m = cxxMethodDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     u
     v
     """
@@ -129,6 +133,20 @@ def cxxMethodDecl(*args):
 
 
 def decl(*args):
+    """Match C++ methods
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {};
+    ...  class Y {}; 
+    ... '''
+    >>> m = decl()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    Y
+    """
     return Matcher(is_decl, *args)
 
 
@@ -143,7 +161,7 @@ def enumDecl(*args):
     >>> m = enumDecl()
     >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     Y
     """
@@ -163,7 +181,7 @@ def fieldDecl(*args):
     >>> m = fieldDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     u
     v
     """
@@ -181,7 +199,7 @@ def functionDecl(*args):
     >>> m = functionDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     u
     v
     """
@@ -189,6 +207,20 @@ def functionDecl(*args):
 
 
 def has(*args):
+    """Match if a cursor has a child that matches
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   void f();
+    ...  };
+    ...  class Y;
+    ... '''
+    >>> m = cxxRecordDecl(has(cxxMethodDecl()))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
     return ChildAnyOfMatcher(*args)
 
 
@@ -203,7 +235,7 @@ def hasName(name):
     >>> m = cxxRecordDecl(hasName('X'))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return NameMatcher(name)
@@ -222,7 +254,7 @@ def hasReturnType(matcher):
     ...         hasReturnType(builtinType()))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     v
     """
     return ReturnTypeTraversalMatcher(matcher)
@@ -242,7 +274,7 @@ def hasStaticStorageDuration():
     ...         hasStaticStorageDuration())
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     u
     """
     return Matcher(has_storage_class(StorageClass.STATIC))
@@ -261,7 +293,7 @@ def hasTypename(typename):
     >>> m = cxxRecordDecl(hasTypename('X::Y'))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.type.spelling
+    ...         print(c.type.spelling)
     X::Y
     """
     return TypenameMatcher(typename)
@@ -279,7 +311,7 @@ def isDerivedFrom(name):
     >>> m = cxxRecordDecl(isDerivedFrom('X'))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     Y
     Z
     """
@@ -298,7 +330,7 @@ def isSameOrDerivedFrom(name):
     >>> m = cxxRecordDecl(isSameOrDerivedFrom('X'))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     Y
     Z
@@ -316,7 +348,7 @@ def namespaceDecl(*args):
     >>> m = namespaceDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return Matcher(is_kind(CursorKind.NAMESPACE), *args)
@@ -333,13 +365,27 @@ def recordDecl(*args):
     >>> m = recordDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return Matcher(is_kind(CursorKind.STRUCT_DECL), *args)
 
 
 def stmt(*args):
+    """Matches structures 
+
+    >>> from glud import *
+    >>> config = '''
+    ... void f() { }
+    ... '''
+    >>> m = stmt()
+    >>> i = 0
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         i += 1
+    >>> print(i)
+    1
+    """
     return Matcher(is_stmt, *args)
 
 
@@ -353,7 +399,7 @@ def typedefDecl(*args):
     >>> m = typedefDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     """
     return Matcher(is_kind(CursorKind.TYPEDEF_DECL), *args)
@@ -371,7 +417,7 @@ def unless(*args):
     >>> m = cxxRecordDecl(unless(hasName('Y')))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     X
     Z
     """
@@ -379,6 +425,20 @@ def unless(*args):
 
 
 def isDefinition():
+    """Inverts the match of the children
+
+    >>> from glud import *
+    >>> config = '''
+    ... class X {};
+    ... class Y;
+    ... '''
+    >>> m = cxxRecordDecl(isDefinition())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+
     return Matcher(is_definition)
 
 
@@ -396,7 +456,7 @@ def hasAncestor(matcher):
     ...         hasAncestor(namespaceDecl(hasName('X'))))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
-    ...         print c.spelling
+    ...         print(c.spelling)
     Y
     """
     return AncestorMatcher(matcher)

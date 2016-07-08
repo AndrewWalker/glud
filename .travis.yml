@@ -1,25 +1,33 @@
 language: python
-sudo: required
-dist: trusty
+
 python:
-    - "2.7"
-before_install:
-    - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-    - echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main" | sudo tee -a /etc/apt/sources.list
-    - sudo apt-get update -qq
-    - sudo apt-get install -y python-clang-3.8 libclang1-3.8
-    - ln -s /usr/lib/python2.7/dist-packages/clang
-    - sudo ln -s /usr/lib/llvm-3.8/lib/libclang-3.8.so.1 /usr/local/lib/libclang-3.8.so
-    - sudo ln -s /usr/lib/llvm-3.8/lib/libclang.so.1 /usr/local/lib/libclang.so
-    - sudo ln -s /usr/bin/llvm-config-3.8 /usr/local/bin/llvm-config
-    - sudo ln -s /usr/bin/clang-3.8 /usr/local/bin/clang
-    - sudo ln -s /usr/bin/clang++-3.8 /usr/local/bin/clang++
-    - export PATH=$PATH:/usr/local/bin
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+
+env:
+  - LLVM_HOME=/usr/lib/llvm-3.8
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.8
+    packages: 
+      - clang-3.8
+      - libclang-3.8-dev
+
 install:
-    - pip install -r requirements.txt
-    - python setup.py install
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LLVM_HOME/lib
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then ln -s /usr/lib/python2.7/dist-packages/clang; fi
+  - pip install -r requirements.txt
+  - python setup.py install
+
 script:
-    - python setup.py nosetests
+  - python setup.py nosetests 
+  - coverage report --show-missing
+
 after_success:
-    - coveralls
+  - coveralls
+

@@ -65,11 +65,11 @@ def has_storage_class(kind):
 
 
 def is_decl(c):
-    return c.is_declaration()
+    return c.kind.is_declaration()
 
 
 def is_stmt(c):
-    return c.is_stmt()
+    return c.kind.is_statement()
 
 
 is_public = has_access(AccessSpecifier.PUBLIC)
