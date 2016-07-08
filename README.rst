@@ -12,13 +12,36 @@ does for the C++ Clang API.
 
 |license| |build| |coverage|
 
-*Ubuntu Linux is the only offically supported target platform* 
+Examples
+========
+
+On the code snippet
+
+.. code:: cpp
+
+    // input.cpp
+    namespace X {
+        class Y {};
+    }
+    class Y {};
+
+You could match a class named X in the namespace Y with the matcher:
+
+.. code:: python
+
+    from glud import *
+    m = cxxRecordDecl(
+             hasName('Y'),
+             hasAncestor(namespaceDecl(hasName('X'))))
+    tu = parse('input.cpp')
+    matches = walk(m, tu.cursor)
+
 
 Prerequisites
 =============
 
 Install a recent version of Clang and the python libclang bindings. On Ubuntu
-you can install pre-built binaries from the llvm repositories:
+Trusty, you can install pre-built binaries from the LLVM apt repositories:
 
 .. code:: console
 
@@ -31,9 +54,7 @@ To run glud, you'll need to make sure that libclang.so is on your loader path.
 
 .. code:: console
 
-    sudo ln -s /usr/lib/llvm-3.8/lib/libclang-3.8.so.1 /usr/local/lib/libclang-3.8.so
-    sudo ln -s /usr/lib/llvm-3.8/lib/libclang.so.1 /usr/local/lib/libclang.so
-    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/lib/llvm-3.8/lib
 
 Installing
 ==========
