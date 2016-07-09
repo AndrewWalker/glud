@@ -59,17 +59,23 @@ def is_kind(kind):
 
 
 def has_storage_class(kind):
+    """Check if the cursor has a particular (eg/ static) storage class
+    """
     def _has_storage_class(cursor):
         return cursor.storage_class == kind
     return _has_storage_class
 
 
 def is_decl(c):
+    """Check if a cursor is a declaration
+    """
     return c.kind.is_declaration()
 
 
 def is_stmt(c):
-    return c.kind.is_statement()
+    """Check if a cursor is a statement
+    """
+    return c.kind.is_declaration()
 
 
 is_public = has_access(AccessSpecifier.PUBLIC)

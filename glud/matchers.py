@@ -3,18 +3,26 @@ from .internal import *
 
 
 def allOf(*args):
+    """Matches if all of the argument matchers match
+    """
     return Matcher(*args)
 
 
 def anyOf(*args):
+    """Matches if any of the argument matchers match
+    """
     return AnyOfMatcher(*args)
 
 
 def hasType(matcher):
+    """Matches if the type associated with the current cursor matches
+    """
     return TypeTraversalMatcher(matcher)
 
 
 def anything():
+    """Matches anything
+    """
     return TrueMatcher()
 
 
@@ -36,6 +44,8 @@ def anyArgument(matcher):
 
 
 def builtinType(*args):
+    """Matches builtin primitive types (eg/ integers, booleans and float)
+    """
     return AllOfTypeMatcher(is_builtin, *args)
 
 
@@ -443,7 +453,8 @@ def isDefinition():
 
 
 def hasAncestor(matcher):
-    """
+    """Matches if the current cursor has an ancestor that matches
+
     >>> from glud import *
     >>> config = '''
     ... namespace X {
