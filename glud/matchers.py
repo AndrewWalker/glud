@@ -218,6 +218,7 @@ def functionDecl(*args):
 
 def has(*args):
     """Match if a cursor has a child that matches
+
     >>> from glud import *
     >>> config = '''
     ...  class X {
