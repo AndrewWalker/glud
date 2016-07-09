@@ -20,10 +20,11 @@ def read(filename):
         return fh.read() 
 
 def requires():
+    req = ['asciitree']
     if sys.version_info.major == 2:
-        return ['clang'] 
+        return req + ['clang'] 
     else: 
-        return ['libclang-py3'] 
+        return req + ['libclang-py3'] 
 
 
 setup(
