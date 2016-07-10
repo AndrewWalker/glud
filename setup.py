@@ -54,4 +54,5 @@ setup(
         'Operating System :: POSIX :: Linux',
     ],
     test_suite='tests',
+    zip_safe=False
 )
