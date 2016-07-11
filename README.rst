@@ -10,7 +10,7 @@ Glud is an abstraction on the libclang library that make matching fragments of
 the Clang AST simple and Pythonic, in the same way that `libclangastmatchers`_
 does for the C++ Clang API. 
 
-|license| |build| |coverage|
+|license| |build| |coverage| |docs|
 
 Examples
 ========
@@ -104,3 +104,6 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
    :target: https://coveralls.io/github/AndrewWalker/glud?branch=master
    :alt: Coverage Testing Results
 
+.. |docs| image:: https://readthedocs.org/projects/docs/badge/?version=latest
+   :alt: Documentation Status
+   :target: http://glud.readthedocs.io/en/latest/?badge=latest
