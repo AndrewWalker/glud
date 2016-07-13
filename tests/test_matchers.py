@@ -6,6 +6,22 @@ class MatcherRegressionTest(BaseGludTest):
     """Extended tests here to verify functionaility is preserved
     """
 
+    def test_func_return(self):
+        config = '''
+        namespace N {
+          class Z {
+          public:
+           enum X {};
+          };
+          Z::X f();
+        }
+        '''
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        m = functionDecl(hasName('f'))
+        for c in walk(m, tu.cursor):
+            self.assertEquals('Z::X', c.result_type.spelling) 
+            self.assertEquals('N::Z::X', c.result_type.get_canonical().spelling) 
+
     def test_enum_decl_aux(self):
         # Document existing behavior 
 
