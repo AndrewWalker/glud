@@ -1,5 +1,6 @@
-from clang.cindex import AccessSpecifier, StorageClass
-from clang.cindex import *
+import clang.cindex
+from clang.cindex import AccessSpecifier, TypeKind
+
 
 __primitive_types = set([
     TypeKind.VOID,

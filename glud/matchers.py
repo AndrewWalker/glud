@@ -1,6 +1,15 @@
+from clang.cindex import CursorKind
 from .predicates import *
 from .internal import *
 
+__all__ = [
+    'allOf', 'anyOf', 'hasType', 'anything', 'anyArgument', 'builtinType',
+    'classTemplateDecl', 'cxxRecordDecl', 'cxxConstructorDecl',
+    'cxxDestructorDecl', 'cxxMethodDecl', 'decl', 'enumDecl', 'fieldDecl',
+    'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
+    'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
+    'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
+]
 
 def allOf(*args):
     """Matches if all of the argument matchers match
@@ -288,7 +297,7 @@ def hasStaticStorageDuration():
     ...         print(c.spelling)
     u
     """
-    return Matcher(has_storage_class(StorageClass.STATIC))
+    return Matcher(has_storage_class(clang.cindex.StorageClass.STATIC))
 
 
 def hasTypename(typename):
