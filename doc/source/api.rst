@@ -66,34 +66,37 @@ Equivalents of the unstable C++ AST Matchers
 
 .. autosummary::
    allOf
-   anyOf
-   hasType
-   anything
    anyArgument
+   anyOf
+   anything
    builtinType
    classTemplateDecl
-   cxxRecordDecl
    cxxConstructorDecl
    cxxDestructorDecl
    cxxMethodDecl
+   cxxRecordDecl
    decl
    enumDecl
    fieldDecl
    functionDecl
    has
+   hasAncestor
    hasName
+   hasParent
    hasReturnType
    hasStaticStorageDuration
+   hasType
    hasTypename
+   isDefinition
    isDerivedFrom
+   isExpansionInFileMatching
    isSameOrDerivedFrom
    namespaceDecl
    recordDecl
    stmt
    typedefDecl
    unless
-   isDefinition
-   hasAncestor
+   varDecl
 
 
 

@@ -9,7 +9,7 @@ __all__ = [
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
-    'isExpansionInFileMatching', 'varDecl'
+    'isExpansionInFileMatching', 'varDecl', 'hasParent'
 ]
 
 def allOf(*args):
