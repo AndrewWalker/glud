@@ -25,3 +25,4 @@ Contents
 
    install.rst
    api.rst
+   changelog.rst
