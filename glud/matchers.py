@@ -497,3 +497,21 @@ def hasAncestor(matcher):
     Y
     """
     return AncestorMatcher(matcher)
+
+
+def varDecl(*args):
+    """Inverts the match of the children
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int a;
+    ... '''
+    >>> m = varDecl()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    a
+    """
+    return Matcher(is_kind(CursorKind.VAR_DECL), *args)
+
+
