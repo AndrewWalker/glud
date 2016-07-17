@@ -9,6 +9,7 @@ __all__ = [
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
+    'isExpansionInFileMatching'
 ]
 
 def allOf(*args):
@@ -458,8 +459,23 @@ def isDefinition():
     ...         print(c.spelling)
     X
     """
-
     return Matcher(is_definition)
+
+
+def isExpansionInFileMatching(pattern):
+    """Matches if the nodes location matches a pattern
+
+    >>> from glud import *
+    >>> config = '''
+    ... class X;
+    ... '''
+    >>> m = isExpansionInFileMatching('tmp.cpp')
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+    return LocationMatcher(pattern)
 
 
 def hasAncestor(matcher):

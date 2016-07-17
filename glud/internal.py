@@ -6,7 +6,7 @@ __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
-    'AncestorMatcher', 'TrueMatcher'
+    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher'
 ]
 
 
@@ -172,3 +172,16 @@ class AncestorMatcher(Matcher):
         return False
 
 
+class LocationMatcher(object):
+    def __init__(self, pattern):
+        super(LocationMatcher, self).__init__()
+        self.pattern = pattern
+
+    def __call__(self, cursor):
+        try:
+            fname = cursor.location.file.name 
+            return re.match(self.pattern, fname)
+        except:
+            return False
+        return False
+ 
