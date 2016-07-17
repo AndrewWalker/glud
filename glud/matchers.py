@@ -9,7 +9,7 @@ __all__ = [
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
-    'isExpansionInFileMatching'
+    'isExpansionInFileMatching', 'varDecl'
 ]
 
 def allOf(*args):
@@ -513,5 +513,25 @@ def varDecl(*args):
     a
     """
     return Matcher(is_kind(CursorKind.VAR_DECL), *args)
+
+
+def hasParent(*args):
+    """Matches if the direct parent node matches
+
+    >>> from glud import *
+    >>> config = '''
+    ... namespace X {
+    ...   int a;
+    ... }
+    ... int b;
+    ... '''
+    >>> m = varDecl(hasParent(namespaceDecl(hasName('X'))))
+    >>> tuc = parse_string(config).cursor
+    >>> for c in tuc.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    a
+    """
+    return ParentMatcher(*args)
 
 

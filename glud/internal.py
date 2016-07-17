@@ -6,7 +6,7 @@ __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
-    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher'
+    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher'
 ]
 
 
@@ -170,6 +170,19 @@ class AncestorMatcher(Matcher):
                 return True
             c = c.semantic_parent
         return False
+
+
+class ParentMatcher(Matcher):
+    def __init__(self, m):
+        super(ParentMatcher, self).__init__(m)
+
+    def __call__(self, cursor):
+        assert(cursor is not None)
+        assert(type(cursor) == Cursor)
+        p = cursor.semantic_parent
+        if p is None:
+            return False
+        return super(ParentMatcher, self).__call__(p)
 
 
 class LocationMatcher(object):
