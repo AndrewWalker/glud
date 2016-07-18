@@ -340,7 +340,7 @@ def isDerivedFrom(name):
 
 
 def isSameOrDerivedFrom(name):
-    """Match if a C++ type inherits from a named class
+    """Match if derives-from (or is-a) class with a given name
 
     >>> from glud import *
     >>> config = '''
@@ -393,7 +393,7 @@ def recordDecl(*args):
 
 
 def stmt(*args):
-    """Matches structures 
+    """Matches statements
 
     >>> from glud import *
     >>> config = '''
@@ -446,7 +446,7 @@ def unless(*args):
 
 
 def isDefinition():
-    """Inverts the match of the children
+    """Matches if the cursor is a definition
 
     >>> from glud import *
     >>> config = '''
@@ -500,7 +500,7 @@ def hasAncestor(matcher):
 
 
 def varDecl(*args):
-    """Inverts the match of the children
+    """Matches variable declarations
 
     >>> from glud import *
     >>> config = '''
