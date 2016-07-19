@@ -9,7 +9,8 @@ __all__ = [
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
-    'isExpansionInFileMatching', 'varDecl', 'hasParent', 'argumentCountIs'
+    'isExpansionInFileMatching', 'varDecl', 'hasParent', 'argumentCountIs',
+    'hasCanonicalType'
 ]
 
 def allOf(*args):
@@ -552,3 +553,6 @@ def argumentCountIs(N):
     """
     return ArgumentCountMatcher(N)
 
+
+def hasCanonicalType(m):
+    return CanonicalTypeTraversalMatcher(m)

@@ -7,7 +7,7 @@ __all__ = [
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
-    'ArgumentCountMatcher'
+    'ArgumentCountMatcher', 'CanonicalTypeTraversalMatcher'
 ]
 
 
@@ -90,7 +90,7 @@ class NameMatcher(Matcher):
     def __init__(self, pattern):
         """Test if the  name refered to by the cursor matches a regex
         """
-        super(NameMatcher, self).__init__([])
+        super(NameMatcher, self).__init__()
         self.pattern = pattern
 
     def __call__(self, cursor):
@@ -211,4 +211,14 @@ class ArgumentCountMatcher(Matcher):
         except:
             return False
         return False
- 
+
+
+class CanonicalTypeTraversalMatcher(TypeTraversalMatcher):
+    def __init__(self, matcher):
+        super(CanonicalTypeTraversalMatcher, self).__init__(matcher)
+
+    def traversal(self, t):
+        return t.get_canonical()
+
+    def __call__(self, t):
+        return self.matcher(self.traversal(t))
