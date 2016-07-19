@@ -69,6 +69,7 @@ Equivalents of the unstable C++ AST Matchers
    anyArgument
    anyOf
    anything
+   argumentCountIs
    builtinType
    classTemplateDecl
    cxxConstructorDecl

@@ -6,7 +6,8 @@ __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
-    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher'
+    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
+    'ArgumentCountMatcher'
 ]
 
 
@@ -23,7 +24,7 @@ class Matcher(object):
         return all(ms)
 
 
-class TrueMatcher(object):
+class TrueMatcher(Matcher):
     """Matcher that always returns true
     """
 
@@ -185,7 +186,7 @@ class ParentMatcher(Matcher):
         return super(ParentMatcher, self).__call__(p)
 
 
-class LocationMatcher(object):
+class LocationMatcher(Matcher):
     def __init__(self, pattern):
         super(LocationMatcher, self).__init__()
         self.pattern = pattern
@@ -194,6 +195,19 @@ class LocationMatcher(object):
         try:
             fname = cursor.location.file.name 
             return re.match(self.pattern, fname)
+        except:
+            return False
+        return False
+
+
+class ArgumentCountMatcher(Matcher):
+    def __init__(self, N):
+        super(ArgumentCountMatcher, self).__init__()
+        self.N = N 
+
+    def __call__(self, cursor):
+        try:
+            return self.N == len(list(cursor.get_arguments()))
         except:
             return False
         return False

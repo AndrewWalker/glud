@@ -8,7 +8,8 @@ Release History
 
 **New Features**
 
-- Added new matchers, isExpansionInFileMatching, varDecl and hasParent
+- Added new matchers - argumentCountIs, isExpansionInFileMatching, varDecl and
+  hasParent
 
 **Improvements**
 
