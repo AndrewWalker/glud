@@ -683,3 +683,60 @@ def isStruct():
     Y
     """
     return Matcher(is_kind(CursorKind.STRUCT_DECL))
+
+
+def isPublic():
+    """Test if a cursor is public
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   public:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isPublic())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PUBLIC))
+
+
+def isProtected():
+    """Test if a cursor is protected
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   protected:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isProtected())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PROTECTED))
+
+
+def isPrivate():
+    """Test if a cursor is private
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   private:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isPrivate())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PRIVATE))

@@ -42,4 +42,20 @@ class MatcherRegressionTest(BaseGludTest):
         self.assertEquals( 'N::Y',    matches[1] )
         self.assertEquals( 'N::Z::X', matches[2] )
 
+    def test_anon_names(self):
+        # Document existing behavior 
+
+        config = '''
+            struct X {
+                enum {
+                    Y = 1
+                };
+            };
+            void f(int);
+        '''
+        m = hasName('Z')
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        lst = list(walk(m, tu.cursor))
+            
+
 

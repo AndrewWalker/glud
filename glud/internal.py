@@ -95,9 +95,7 @@ class NameMatcher(Matcher):
         self.pattern = pattern
 
     def __call__(self, cursor):
-        name = cursor.spelling
-        if name is None:
-            return False
+        name = cursor.spelling or ''
         return re.match(self.pattern + '$', name) is not None
 
 
@@ -109,9 +107,7 @@ class TypenameMatcher(Matcher):
         self.pattern = pattern
 
     def __call__(self, cursor):
-        typename = cursor.type.spelling
-        if typename is None:
-            return False
+        typename = cursor.type.spelling or ''
         return re.match(self.pattern + '$', typename) is not None
 
 

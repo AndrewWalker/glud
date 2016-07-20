@@ -78,13 +78,3 @@ def is_stmt(c):
     """Check if a cursor is a statement
     """
     return c.kind.is_declaration()
-
-
-is_public = has_access(AccessSpecifier.PUBLIC)
-is_public.__doc__ = 'Test if a cursor is public'
-
-is_protected = has_access(AccessSpecifier.PROTECTED)
-is_protected.__doc__ = 'Test if a cursor is protected'
-
-is_private = has_access(AccessSpecifier.PRIVATE)
-is_private.__doc__ = 'Test if a cursor is private'
