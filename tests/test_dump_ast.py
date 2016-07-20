@@ -16,5 +16,3 @@ class DumpAST_Tests(BaseGludTest):
         root = self.parse(s)
         dmp = glud.dump(root)
         self.assertEquals(str, type(dmp))
-
-
