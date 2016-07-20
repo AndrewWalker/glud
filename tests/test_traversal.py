@@ -12,6 +12,7 @@ class TraversalTest(BaseGludTest):
         c = self.parse(s)
         walk(anything(), c)
 
+
     def test_iter_children(self):
         s = '''
         class X {};
@@ -19,7 +20,3 @@ class TraversalTest(BaseGludTest):
         '''
         c = self.parse(s)
         iter_child_nodes(anything(), c)
-
-       
-
-

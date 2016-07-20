@@ -10,36 +10,87 @@ __all__ = [
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
     'isExpansionInFileMatching', 'varDecl', 'hasParent', 'argumentCountIs',
-    'hasCanonicalType'
+    'hasCanonicalType', 'isStruct', 'isClass'
 ]
 
 
 def allOf(*args):
     """Matches if all of the argument matchers match
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X;
+    ...  class Y;
+    ... '''
+    >>> m = allOf(cxxRecordDecl(), hasName('X'))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
     """
     return Matcher(*args)
 
 
 def anyOf(*args):
     """Matches if any of the argument matchers match
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int x;
+    ...  class Y {};
+    ...  enum Z {};
+    ... '''
+    >>> m = anyOf(varDecl(), isClass())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    Y
     """
     return AnyOfMatcher(*args)
 
 
 def hasType(matcher):
     """Matches if the type associated with the current cursor matches
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int x;
+    ...  long y;
+    ... '''
+    >>> m = varDecl(hasType(hasName('int')))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
     """
     return TypeTraversalMatcher(matcher)
 
 
 def anything():
     """Matches anything
+
+    >>> from glud import *
+    >>> config = '''
+    ... namespace W {
+    ...  int x;
+    ...  class Y;
+    ...  enum Z {};
+    ... }
+    ... '''
+    >>> m = allOf(anything(), hasParent(namespaceDecl()))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    Y
+    Z
     """
     return TrueMatcher()
 
 
 def anyArgument(matcher):
-    """Match C++ class declarations
+    """Match if any method or function argument matches
 
     >>> from glud import *
     >>> config = '''
@@ -57,6 +108,18 @@ def anyArgument(matcher):
 
 def builtinType(*args):
     """Matches builtin primitive types (eg/ integers, booleans and float)
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int x;
+    ...  bool y;
+    ... '''
+    >>> m = varDecl(hasType(builtinType()))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    y
     """
     return AllOfTypeMatcher(is_builtin, *args)
 
@@ -79,21 +142,25 @@ def classTemplateDecl(*args):
 
 
 def cxxRecordDecl(*args):
-    """Match C++ class declarations
+    """Matches C++ class declarations.
 
     >>> from glud import *
     >>> config = '''
-    ...  class X {};
-    ...  class Y {};
+    ...  class W;
+    ...  template<typename T> class X {};
+    ...  struct Y {};
+    ...  union Z {};
     ... '''
     >>> m = cxxRecordDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
     ...         print(c.spelling)
+    W
     X
-    Y
     """
-    return Matcher(is_kind(CursorKind.CLASS_DECL), *args)
+    return Matcher(anyOf(
+                is_kind(CursorKind.CLASS_DECL),
+                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
 
 
 def cxxConstructorDecl(*args):
@@ -155,12 +222,13 @@ def cxxMethodDecl(*args):
 
 
 def decl(*args):
-    """Match C++ methods
+    """Match any declaration
 
     >>> from glud import *
     >>> config = '''
     ...  class X {};
-    ...  class Y {};
+    ...  struct Y {};
+    ...  enum Z {};
     ... '''
     >>> m = decl()
     >>> for c in parse_string(config).cursor.walk_preorder():
@@ -168,6 +236,7 @@ def decl(*args):
     ...         print(c.spelling)
     X
     Y
+    Z
     """
     return Matcher(is_decl, *args)
 
@@ -273,8 +342,7 @@ def hasReturnType(matcher):
     ... X u();
     ... int v();
     ... '''
-    >>> m = functionDecl(
-    ...         hasReturnType(builtinType()))
+    >>> m = functionDecl(hasReturnType(builtinType()))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
     ...         print(c.spelling)
@@ -378,20 +446,29 @@ def namespaceDecl(*args):
 
 
 def recordDecl(*args):
-    """Matches structures
+    """Matches class, struct, and union declarations.
 
     >>> from glud import *
     >>> config = '''
-    ... struct X { };
-    ... class Y {};
+    ...  class W;
+    ...  template<typename T> class X {};
+    ...  struct Y {};
+    ...  union Z {};
     ... '''
     >>> m = recordDecl()
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
     ...         print(c.spelling)
+    W
     X
+    Y
+    Z
     """
-    return Matcher(is_kind(CursorKind.STRUCT_DECL), *args)
+    return Matcher(anyOf(
+                is_kind(CursorKind.STRUCT_DECL),
+                is_kind(CursorKind.UNION_DECL),
+                is_kind(CursorKind.CLASS_DECL),
+                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
 
 
 def stmt(*args):
@@ -556,4 +633,53 @@ def argumentCountIs(N):
 
 
 def hasCanonicalType(m):
+    """Matches if a cursor has the specified number of arguments
+
+    >>> from glud import *
+    >>> config = '''
+    ...  namespace X {
+    ...   struct Y;
+    ...   Y f();
+    ...  }
+    ... '''
+    >>> m = functionDecl(hasReturnType(hasCanonicalType(hasName('X::Y'))))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    f
+    """
     return CanonicalTypeTraversalMatcher(m)
+
+
+def isClass():
+    """Matches if a cursor is a class
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X;
+    ...  struct Y;
+    ... '''
+    >>> m = isClass()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+    return Matcher(is_kind(CursorKind.CLASS_DECL))
+
+
+def isStruct():
+    """Matches if a cursor is a struct
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X;
+    ...  struct Y;
+    ... '''
+    >>> m = isStruct()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    Y
+    """
+    return Matcher(is_kind(CursorKind.STRUCT_DECL))

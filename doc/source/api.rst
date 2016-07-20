@@ -82,16 +82,19 @@ Equivalents of the unstable C++ AST Matchers
    functionDecl
    has
    hasAncestor
+   hasCanonicalType
    hasName
    hasParent
    hasReturnType
    hasStaticStorageDuration
    hasType
    hasTypename
+   isClass
    isDefinition
    isDerivedFrom
    isExpansionInFileMatching
    isSameOrDerivedFrom
+   isStruct
    namespaceDecl
    recordDecl
    stmt
