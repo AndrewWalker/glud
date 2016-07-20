@@ -20,10 +20,6 @@ class BaseGludTest(unittest.TestCase):
     def parse_tu(self, s, *args, **kwargs):
         kwargs['args'] = self.cargs
         return glud.parse_string(s, *args, **kwargs)
-   
+
     def parse(self, s, *args, **kwargs):
         return self.parse_tu(s, *args, **kwargs).cursor
-
-
-
-

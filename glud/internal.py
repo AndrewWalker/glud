@@ -7,7 +7,7 @@ __all__ = [
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
-    'ArgumentCountMatcher'
+    'ArgumentCountMatcher', 'CanonicalTypeTraversalMatcher'
 ]
 
 
@@ -33,7 +33,8 @@ class TrueMatcher(Matcher):
 
     def __call__(self, cursor):
         return True
-    
+
+
 class UnlessMatcher(Matcher):
     def __init__(self, *args):
         super(UnlessMatcher, self).__init__(*args)
@@ -84,19 +85,17 @@ class AnyBaseClassMatcher(Matcher):
                 elif self(cdef):
                     return True
         return False
-    
-    
+
+
 class NameMatcher(Matcher):
     def __init__(self, pattern):
         """Test if the  name refered to by the cursor matches a regex
         """
-        super(NameMatcher, self).__init__([])
+        super(NameMatcher, self).__init__()
         self.pattern = pattern
 
     def __call__(self, cursor):
-        name = cursor.spelling
-        if name is None:
-            return False
+        name = cursor.spelling or ''
         return re.match(self.pattern + '$', name) is not None
 
 
@@ -108,12 +107,10 @@ class TypenameMatcher(Matcher):
         self.pattern = pattern
 
     def __call__(self, cursor):
-        typename = cursor.type.spelling
-        if typename is None:
-            return False
+        typename = cursor.type.spelling or ''
         return re.match(self.pattern + '$', typename) is not None
 
-    
+
 class AllOfTypeMatcher(object):
     def __init__(self, *args):
         self.matchers = list(args)
@@ -144,7 +141,7 @@ class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
     def traverse(self, cursor):
         return cursor.result_type
 
-    
+
 class AnyArgumentMatcher(object):
     def __init__(self, matcher):
         self.matcher = matcher
@@ -193,7 +190,7 @@ class LocationMatcher(Matcher):
 
     def __call__(self, cursor):
         try:
-            fname = cursor.location.file.name 
+            fname = cursor.location.file.name
             return re.match(self.pattern, fname)
         except:
             return False
@@ -203,7 +200,7 @@ class LocationMatcher(Matcher):
 class ArgumentCountMatcher(Matcher):
     def __init__(self, N):
         super(ArgumentCountMatcher, self).__init__()
-        self.N = N 
+        self.N = N
 
     def __call__(self, cursor):
         try:
@@ -211,4 +208,14 @@ class ArgumentCountMatcher(Matcher):
         except:
             return False
         return False
- 
+
+
+class CanonicalTypeTraversalMatcher(TypeTraversalMatcher):
+    def __init__(self, matcher):
+        super(CanonicalTypeTraversalMatcher, self).__init__(matcher)
+
+    def traversal(self, t):
+        return t.get_canonical()
+
+    def __call__(self, t):
+        return self.matcher(self.traversal(t))

@@ -19,7 +19,3 @@ class TraversalTest(BaseGludTest):
         '''
         c = self.parse(s)
         iter_child_nodes(anything(), c)
-
-       
-
-

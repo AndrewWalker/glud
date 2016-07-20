@@ -14,32 +14,34 @@ def read_version():
             raise runtimeerror("unable to find version string.")
     return version
 
+
 def read(filename):
     path = os.path.join(os.path.dirname(__file__), filename)
     with io.open(path, encoding='utf8') as fh:
-        return fh.read() 
+        return fh.read()
+
 
 def requires():
     req = ['asciitree']
     if sys.version_info.major == 2:
-        return req + ['clang'] 
-    else: 
-        return req + ['libclang-py3'] 
+        return req + ['clang']
+    else:
+        return req + ['libclang-py3']
 
 
 setup(
-    name         = "glud",
-    install_requires = requires(),
-    description  = "Functional tools for matching nodes in the clang AST",
-    long_description = read('README.rst'),
-    version      = read_version(),
-    author       = "Andrew Walker",
-    author_email = "walker.ab@gmail.com",
-    url          = "http://github.com/AndrewWalker/glud",
-    license      = "MIT",
-    keywords     = [ 'libclang', 'clang', 'AST' ],
-    packages     = find_packages(), 
-    classifiers  = [
+    name="glud",
+    install_requires=requires(),
+    description="Functional tools for matching nodes in the clang AST",
+    long_description=read('README.rst'),
+    version=read_version(),
+    author="Andrew Walker",
+    author_email="walker.ab@gmail.com",
+    url="http://github.com/AndrewWalker/glud",
+    license="MIT",
+    keywords=['libclang', 'clang', 'AST'],
+    packages=find_packages(), 
+    classifiers=[
         'Topic :: Software Development :: Compilers',
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

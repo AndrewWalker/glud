@@ -2,6 +2,9 @@ from asciitree import draw_tree
 
 
 def dump(cursor):
+    """ Display the AST represented by the cursor
+    """
+
     def node_children(node):
         return list(node.get_children())
 
@@ -11,4 +14,3 @@ def dump(cursor):
         return '{} {}'.format(kind, text)
 
     return draw_tree(cursor, node_children, print_node)
-
