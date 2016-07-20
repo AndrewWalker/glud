@@ -9,7 +9,7 @@ __all__ = [
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
-    'isExpansionInFileMatching', 'varDecl', 'hasParent', 'argumentCountIs',
+    'isExpansionInFileMatching', 'varDecl', 'hasParent', 'parameterCountIs',
     'hasCanonicalType', 'isStruct', 'isClass'
 ]
 
@@ -614,7 +614,7 @@ def hasParent(*args):
     return ParentMatcher(*args)
 
 
-def argumentCountIs(N):
+def parameterCountIs(N):
     """Matches if a cursor has the specified number of arguments
 
     >>> from glud import *
@@ -623,13 +623,13 @@ def argumentCountIs(N):
     ...  int g(int);
     ...  int h(int, int);
     ... '''
-    >>> m = functionDecl(argumentCountIs(1))
+    >>> m = functionDecl(parameterCountIs(1))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
     ...         print(c.spelling)
     g
     """
-    return ArgumentCountMatcher(N)
+    return ParameterCountMatcher(N)
 
 
 def hasCanonicalType(m):

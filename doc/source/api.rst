@@ -50,7 +50,6 @@ Equivalents of the unstable C++ AST Matchers
    anyArgument
    anyOf
    anything
-   argumentCountIs
    builtinType
    classTemplateDecl
    cxxConstructorDecl
@@ -74,9 +73,13 @@ Equivalents of the unstable C++ AST Matchers
    isDefinition
    isDerivedFrom
    isExpansionInFileMatching
+   isPublic
+   isPrivate
+   isProtected
    isSameOrDerivedFrom
    isStruct
    namespaceDecl
+   parameterCountIs
    recordDecl
    stmt
    typedefDecl

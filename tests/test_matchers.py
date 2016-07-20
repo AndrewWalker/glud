@@ -53,3 +53,32 @@ class MatcherRegressionTest(BaseGludTest):
         m = hasName('Z')
         tu = parse_string(config, args='-x c++ -std=c++11'.split())
         lst = list(walk(m, tu.cursor))
+
+    def test_has_ancestor_regression(self):
+        config = '''
+            class X;
+        '''
+        m = hasAncestor(isClass())
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        lst = list(walk(m, tu.cursor))
+
+    def test_no_location_match(self):
+        config = '''
+            class X;
+        '''
+        m = isExpansionInFileMatching('notarealfile.cpp')
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        lst = list(walk(m, tu.cursor))
+
+    def test_no_parameters(self):
+        config = '''
+            class X {
+            public:
+                void f();
+                void g(int);
+            };
+            void f();
+        '''
+        m = parameterCountIs(0)
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        self.assertEquals(1, len(list(walk(m, tu.cursor))))

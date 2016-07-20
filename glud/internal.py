@@ -7,7 +7,7 @@ __all__ = [
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
-    'ArgumentCountMatcher', 'CanonicalTypeTraversalMatcher'
+    'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher'
 ]
 
 
@@ -194,20 +194,16 @@ class LocationMatcher(Matcher):
             return re.match(self.pattern, fname)
         except:
             return False
-        return False
 
 
-class ArgumentCountMatcher(Matcher):
+class ParameterCountMatcher(Matcher):
     def __init__(self, N):
-        super(ArgumentCountMatcher, self).__init__()
+        super(ParameterCountMatcher, self).__init__()
         self.N = N
 
     def __call__(self, cursor):
-        try:
-            return self.N == len(list(cursor.get_arguments()))
-        except:
-            return False
-        return False
+        assert(cursor is not None)
+        return self.N == len(list(cursor.get_arguments()))
 
 
 class CanonicalTypeTraversalMatcher(TypeTraversalMatcher):
