@@ -13,6 +13,7 @@ __all__ = [
     'hasCanonicalType'
 ]
 
+
 def allOf(*args):
     """Matches if all of the argument matchers match
     """
@@ -38,7 +39,7 @@ def anything():
 
 
 def anyArgument(matcher):
-    """Match C++ class declarations 
+    """Match C++ class declarations
 
     >>> from glud import *
     >>> config = '''
@@ -61,7 +62,7 @@ def builtinType(*args):
 
 
 def classTemplateDecl(*args):
-    """Match C++ class declarations 
+    """Match C++ template class declarations
 
     >>> from glud import *
     >>> config = '''
@@ -78,7 +79,7 @@ def classTemplateDecl(*args):
 
 
 def cxxRecordDecl(*args):
-    """Match C++ class declarations 
+    """Match C++ class declarations
 
     >>> from glud import *
     >>> config = '''
@@ -131,7 +132,7 @@ def cxxDestructorDecl(*args):
     ~X
     """
     return Matcher(is_kind(CursorKind.DESTRUCTOR), *args)
-    
+
 
 def cxxMethodDecl(*args):
     """Match C++ methods
@@ -159,7 +160,7 @@ def decl(*args):
     >>> from glud import *
     >>> config = '''
     ...  class X {};
-    ...  class Y {}; 
+    ...  class Y {};
     ... '''
     >>> m = decl()
     >>> for c in parse_string(config).cursor.walk_preorder():
@@ -361,7 +362,7 @@ def isSameOrDerivedFrom(name):
 
 
 def namespaceDecl(*args):
-    """Match a C++ namespace 
+    """Match a C++ namespace declaration
 
     >>> from glud import *
     >>> config = '''
@@ -377,7 +378,7 @@ def namespaceDecl(*args):
 
 
 def recordDecl(*args):
-    """Matches structures 
+    """Matches structures
 
     >>> from glud import *
     >>> config = '''

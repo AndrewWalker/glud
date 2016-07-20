@@ -1,7 +1,8 @@
 import clang.cindex
 import os
 
-__all__ = [ 'ClangDiagnosticException', 'parse_string', 'parse' ]
+__all__ = ['ClangDiagnosticException', 'parse_string', 'parse']
+
 
 class ClangDiagnosticException(Exception):
     """Encapsulates Clang diagnostics as an exception
@@ -16,10 +17,12 @@ class ClangDiagnosticException(Exception):
             s += '%s\n' % item
         return s
 
+
 def _ensure_parse_valid(tu):
     if len(tu.diagnostics) > 0:
         raise ClangDiagnosticException(tu.diagnostics)
-    return tu        
+    return tu
+
 
 def parse_string(contents, name='tmp.cpp', **kwargs):
     """ Parse a string of C/C++ code
@@ -28,6 +31,7 @@ def parse_string(contents, name='tmp.cpp', **kwargs):
     tu = idx.parse(name, unsaved_files=[(name, contents)], **kwargs)
     return _ensure_parse_valid(tu)
 
+
 def parse(name, **kwargs):
     """ Parse a C/C++ file
     """
@@ -35,5 +39,3 @@ def parse(name, **kwargs):
     assert os.path.exists(name)
     tu = idx.parse(name, **kwargs)
     return _ensure_parse_valid(tu)
-
-

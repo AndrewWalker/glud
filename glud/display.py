@@ -11,4 +11,3 @@ def dump(cursor):
         return '{} {}'.format(kind, text)
 
     return draw_tree(cursor, node_children, print_node)
-

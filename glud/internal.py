@@ -33,7 +33,8 @@ class TrueMatcher(Matcher):
 
     def __call__(self, cursor):
         return True
-    
+
+
 class UnlessMatcher(Matcher):
     def __init__(self, *args):
         super(UnlessMatcher, self).__init__(*args)
@@ -84,8 +85,8 @@ class AnyBaseClassMatcher(Matcher):
                 elif self(cdef):
                     return True
         return False
-    
-    
+
+
 class NameMatcher(Matcher):
     def __init__(self, pattern):
         """Test if the  name refered to by the cursor matches a regex
@@ -113,7 +114,7 @@ class TypenameMatcher(Matcher):
             return False
         return re.match(self.pattern + '$', typename) is not None
 
-    
+
 class AllOfTypeMatcher(object):
     def __init__(self, *args):
         self.matchers = list(args)
@@ -144,7 +145,7 @@ class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
     def traverse(self, cursor):
         return cursor.result_type
 
-    
+
 class AnyArgumentMatcher(object):
     def __init__(self, matcher):
         self.matcher = matcher
@@ -193,7 +194,7 @@ class LocationMatcher(Matcher):
 
     def __call__(self, cursor):
         try:
-            fname = cursor.location.file.name 
+            fname = cursor.location.file.name
             return re.match(self.pattern, fname)
         except:
             return False
@@ -203,7 +204,7 @@ class LocationMatcher(Matcher):
 class ArgumentCountMatcher(Matcher):
     def __init__(self, N):
         super(ArgumentCountMatcher, self).__init__()
-        self.N = N 
+        self.N = N
 
     def __call__(self, cursor):
         try:

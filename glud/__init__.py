@@ -4,5 +4,3 @@ from .traversal import *
 from .predicates import *
 from .matchers import *
 from .version import __version__
-
-

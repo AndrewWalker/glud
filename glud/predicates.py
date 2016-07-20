@@ -43,6 +43,7 @@ def is_definition(cursor):
     defn = cursor.get_definition()
     return (defn is not None) and (cursor.location == defn.location)
 
+
 def has_access(access):
     """ Test if a cursor has a access specifier
     """
@@ -87,5 +88,3 @@ is_protected.__doc__ = 'Test if a cursor is protected'
 
 is_private = has_access(AccessSpecifier.PRIVATE)
 is_private.__doc__ = 'Test if a cursor is private'
-
-
