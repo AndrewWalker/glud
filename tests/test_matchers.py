@@ -70,7 +70,10 @@ class MatcherRegressionTest(BaseGludTest):
         tu = parse_string(config, args='-x c++ -std=c++11'.split())
         lst = list(walk(m, tu.cursor))
 
-    def test_no_parameters(self):
+    def test_parameter_count_is_on_arbitrary_nodes(self):
+        # this is a regression test to confirm behavior does
+        # not change between clang releases.
+        # it's sufficient to show that now exception is thrown
         config = '''
             class X {
             public:
@@ -81,4 +84,4 @@ class MatcherRegressionTest(BaseGludTest):
         '''
         m = parameterCountIs(0)
         tu = parse_string(config, args='-x c++ -std=c++11'.split())
-        self.assertEquals(1, len(list(walk(m, tu.cursor))))
+        list(walk(m, tu.cursor))
