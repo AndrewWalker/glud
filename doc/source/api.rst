@@ -38,25 +38,6 @@ Display the libclang AST, or a filtered subset of
    dump
 
 
-Predicates
-----------
-
-Common tests for cursors and types. 
-
-.. currentmodule:: glud.predicates
-
-.. autosummary::
-   is_builtin
-   is_definition
-   has_access
-   is_kind
-   has_storage_class
-   is_decl
-   is_stmt
-   is_public
-   is_protected
-   is_private
-
 Matchers
 --------
 
