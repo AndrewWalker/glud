@@ -62,6 +62,17 @@ class MatcherRegressionTest(BaseGludTest):
         tu = parse_string(config, args='-x c++ -std=c++11'.split())
         lst = list(walk(m, tu.cursor))
 
+    def test_is_derived_regression(self):
+        config = '''
+            template<class T>
+            class X {
+                struct Y : T {};
+            };
+        '''
+        m = isDerivedFrom('Z')
+        tu = parse_string(config, args='-x c++ -std=c++11'.split())
+        lst = list(walk(m, tu.cursor))
+
     def test_no_location_match(self):
         config = '''
             class X;
