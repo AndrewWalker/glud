@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.4.0 (2016-07-17)
+0.4.0 (2016-07-23)
 ++++++++++++++++++
 
 **New Features**
@@ -14,4 +14,10 @@ Release History
 **Improvements**
 
 - Improved behavior on older versions of libclang
-- Moved existing predicates (isPublic, isProtected, isPrivate) into the matchers
+- Moved existing code from the internal API into the stable interface
+  (isPublic, isProtected, isPrivate) 
+
+**Bug Fixes**
+
+- Corrected the behavior of recordDecl and cxxRecordDecl to more closely map to
+  the libclangastmatchers vision of those matchers

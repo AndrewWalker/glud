@@ -1,21 +1,32 @@
+.. highlight:: python
+
 Glud Documentation
 ==================
 
-Glud is an abstraction on the libclang library that make matching fragments of
-the Clang AST simple and Pythonic.  The intention is to produce something
-that's easier to compose than the default libclang API, and is much closer to
-the Clang AST Matchers library. 
+Do you need to find something in a C++ file? Perhaps you're generating bindings
+for C++ library, generating serialization code, collecting code-metrics or
+developing a style checker?
 
-Glud's priorities are:
+You can solve all of these problems using `libclang`_, a library provided as part
+of `Clang`_ compiler.  However, the challenge with libclang is that it's easy to
+end up in a situation where the code you write can be difficult to write,
+compose and maintain.  
 
-* **Interoperability:** using glud code should not impact any
-  existing libclang code, If you can't solve a problem with glud,
-  you should be able to transparently fall back to using libclang
-  to solve the problem.  
+Glud solves this problem by providing a higher level abstraction that makes it
+easier to find C++ constructs, inspired by `libclangastmatchers`_.
 
-* **Focused on C++:** glud is heavily oriented to working with C++
-  code and contains several abstractions specific to matching
-  classes and member functions.
+Example
+-------
+
+For example, to find all of the classes in C/C++ file::
+
+    import sys  
+    import glud
+    matcher = glud.isClass()
+    translation_unit = glud.parse(sys.argv[1])
+    for cls in glud.walk(matcher, translation_unit.cursor):
+        print(cls.type.spelling)
+
 
 
 Contents
@@ -25,5 +36,10 @@ Contents
    :maxdepth: 2
 
    install.rst
+   quickstart.rst
    api.rst
    changelog.rst
+
+.. _libclang: http://clang.llvm.org/doxygen/group__CINDEX.html
+.. _Clang: http://clang.llvm.org/
+.. _libclangastmatchers: http://clang.llvm.org/docs/LibASTMatchersReference.html

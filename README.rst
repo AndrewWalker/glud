@@ -65,19 +65,13 @@ You can install the latest stable version from PyPI
 
     $ pip install glud
 
-Or, you can install the latest development version from GitHub
-
-.. code:: console 
-
-    $ pip install git+git://github.com/AndrewWalker/glud.git
-
-
 
 Acknowledgements
 ================
 
-This project is in no way affiliated with the LLVM Team or the University of
-Illinois at Urbana-Champaign.
+This project builds on the excellent work of the LLVM team and the University of
+Illinois at Urbana-Champaign, but is in no way affiliated with either.
+
 
 Contributing
 ============

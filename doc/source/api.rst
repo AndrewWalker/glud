@@ -1,3 +1,5 @@
+.. _api:
+
 API
 ===
 
@@ -38,10 +40,12 @@ Display the libclang AST, or a filtered subset of
    dump
 
 
+.. _apimatchers:
+
 Matchers
 --------
 
-Equivalents of the unstable C++ AST Matchers 
+Code that implements Abstract Syntax Tree node matchers, or allow
 
 .. currentmodule:: glud.matchers
 
@@ -95,17 +99,28 @@ Definitions
    :members:
    :undoc-members:
 
-.. automodule:: glud.predicates
+.. automodule:: glud.traversal
    :members:
-   :undoc-members:
+
+.. automodule:: glud.display
+   :members:
 
 .. automodule:: glud.matchers
    :members:
    :undoc-members:
 
-.. automodule:: glud.traversal
+Internal API
+++++++++++++
+
+Internal implementation details that may be useful for building new matchers,
+or understanding the behavior of existing matchers. Nothing in this section is
+guaranteed to remain stable between releases.
+
+
+.. automodule:: glud.predicates
+   :members:
+
+.. automodule:: glud.internal
    :members:
    :undoc-members:
 
-.. automodule:: glud.display
-   :members:
