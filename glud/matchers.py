@@ -10,7 +10,7 @@ __all__ = [
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
     'isExpansionInFileMatching', 'varDecl', 'hasParent', 'parameterCountIs',
-    'hasCanonicalType', 'isStruct', 'isClass'
+    'hasCanonicalType', 'isStruct', 'isClass', 'isPublic', 'isProtected', 'isPrivate'
 ]
 
 
