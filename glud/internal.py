@@ -5,9 +5,10 @@ import re
 __all__ = [
     'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
-    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyArgumentMatcher',
+    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyParameterMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
-    'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher'
+    'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher', 
+    'PointeeTypeTraversalMatcher'
 ]
 
 
@@ -36,6 +37,9 @@ class TrueMatcher(Matcher):
 
 
 class UnlessMatcher(Matcher):
+    """Inverts the match of the children
+    """
+
     def __init__(self, *args):
         super(UnlessMatcher, self).__init__(*args)
 
@@ -134,6 +138,17 @@ class TypeTraversalMatcher(object):
         return self.matcher(self.traverse(cursor))
 
 
+class PointeeTypeTraversalMatcher(object):
+    def __init__(self, inner):
+        self.inner = inner 
+
+    def __call__(self, t):
+        assert(t is not None)
+        assert(type(t) == Type)
+        return self.inner(t.get_pointee())
+
+
+
 class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
     def __init__(self, matcher):
         super(ReturnTypeTraversalMatcher, self).__init__(matcher)
@@ -142,7 +157,7 @@ class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
         return cursor.result_type
 
 
-class AnyArgumentMatcher(object):
+class AnyParameterMatcher(object):
     def __init__(self, matcher):
         self.matcher = matcher
 

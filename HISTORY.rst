@@ -8,8 +8,8 @@ Release History
 
 **New Features**
 
-- Added new matchers - parameterCountIs, isExpansionInFileMatching, varDecl and
-  hasParent, hasCanonicalType
+- Added new matchers - parameterCountIs, isExpansionInFileMatching, varDecl,
+  hasParent, hasCanonicalType, pointee and pointerType
 
 **Improvements**
 
@@ -21,3 +21,4 @@ Release History
 
 - Corrected the behavior of recordDecl and cxxRecordDecl to more closely map to
   the libclangastmatchers vision of those matchers
+- Corrected the name of anyArgument to hasAnyParameter

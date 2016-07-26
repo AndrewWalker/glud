@@ -3,14 +3,15 @@ from .predicates import *
 from .internal import *
 
 __all__ = [
-    'allOf', 'anyOf', 'hasType', 'anything', 'anyArgument', 'builtinType',
+    'allOf', 'anyOf', 'hasType', 'anything', 'hasAnyParameter', 'builtinType',
     'classTemplateDecl', 'cxxRecordDecl', 'cxxConstructorDecl',
     'cxxDestructorDecl', 'cxxMethodDecl', 'decl', 'enumDecl', 'fieldDecl',
     'functionDecl', 'has', 'hasName', 'hasReturnType', 'hasStaticStorageDuration',
     'hasTypename', 'isDerivedFrom', 'isSameOrDerivedFrom', 'namespaceDecl',
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
     'isExpansionInFileMatching', 'varDecl', 'hasParent', 'parameterCountIs',
-    'hasCanonicalType', 'isStruct', 'isClass', 'isPublic', 'isProtected', 'isPrivate'
+    'hasCanonicalType', 'isStruct', 'isClass', 'isPublic', 'isProtected', 'isPrivate',
+    'pointerType', 'pointee'
 ]
 
 
@@ -89,7 +90,7 @@ def anything():
     return TrueMatcher()
 
 
-def anyArgument(matcher):
+def hasAnyParameter(matcher):
     """Match if any method or function argument matches
 
     >>> from glud import *
@@ -97,13 +98,13 @@ def anyArgument(matcher):
     ... void f();
     ... void g(int);
     ... '''
-    >>> m = functionDecl(anyArgument(hasType(builtinType())))
+    >>> m = functionDecl(hasAnyParameter(hasType(builtinType())))
     >>> for c in parse_string(config).cursor.walk_preorder():
     ...     if m(c):
     ...         print(c.spelling)
     g
     """
-    return AnyArgumentMatcher(matcher)
+    return AnyParameterMatcher(matcher)
 
 
 def builtinType(*args):
@@ -740,3 +741,40 @@ def isPrivate():
     y
     """
     return Matcher(has_access(AccessSpecifier.PRIVATE))
+
+
+def pointerType(*args):
+    """Test if a cursor has pointer type
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int w;
+    ...  int* x;
+    ...  int** y;
+    ...  int& z = w;
+    ... '''
+    >>> m = varDecl(hasType(pointerType()))
+    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    y
+    """
+    return AllOfTypeMatcher(is_kind(TypeKind.POINTER), *args)
+
+
+def pointee(inner):
+    """Traverse from a pointer to the dereferenced type
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int *x;
+    ...  void *y;
+    ... '''
+    >>> m = varDecl(hasType(pointerType(pointee(hasName('int')))))
+    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    """
+    return PointeeTypeTraversalMatcher(inner)

@@ -51,7 +51,6 @@ Code that implements Abstract Syntax Tree node matchers, or allow
 
 .. autosummary::
    allOf
-   anyArgument
    anyOf
    anything
    builtinType
@@ -66,6 +65,7 @@ Code that implements Abstract Syntax Tree node matchers, or allow
    functionDecl
    has
    hasAncestor
+   hasAnyParameter
    hasCanonicalType
    hasName
    hasParent
@@ -77,19 +77,20 @@ Code that implements Abstract Syntax Tree node matchers, or allow
    isDefinition
    isDerivedFrom
    isExpansionInFileMatching
-   isPublic
    isPrivate
    isProtected
+   isPublic
    isSameOrDerivedFrom
    isStruct
    namespaceDecl
    parameterCountIs
+   pointee
+   pointerType
    recordDecl
    stmt
    typedefDecl
    unless
    varDecl
-
 
 
 Definitions
