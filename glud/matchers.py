@@ -358,7 +358,7 @@ def hasName(name):
 
 
 def hasParameter(N, inner):
-    """Matches if the direct parent node matches
+    """Matches if the N-th parameter matches the inner matcher
 
     >>> from glud import *
     >>> config = '''
