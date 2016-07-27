@@ -40,7 +40,7 @@ setup(
     url="http://github.com/AndrewWalker/glud",
     license="MIT",
     keywords=['libclang', 'clang', 'AST'],
-    packages=find_packages(), 
+    packages=find_packages(),
     classifiers=[
         'Topic :: Software Development :: Compilers',
         'Development Status :: 4 - Beta',

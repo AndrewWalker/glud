@@ -7,7 +7,7 @@ __all__ = [
     'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyParameterMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
-    'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher', 
+    'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher',
     'PointeeTypeTraversalMatcher', 'ParameterMatcher'
 ]
 
@@ -140,13 +140,12 @@ class TypeTraversalMatcher(object):
 
 class PointeeTypeTraversalMatcher(object):
     def __init__(self, inner):
-        self.inner = inner 
+        self.inner = inner
 
     def __call__(self, t):
         assert(t is not None)
         assert(type(t) == Type)
         return self.inner(t.get_pointee())
-
 
 
 class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
