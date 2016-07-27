@@ -68,6 +68,7 @@ Code that implements Abstract Syntax Tree node matchers, or allow
    hasAnyParameter
    hasCanonicalType
    hasName
+   hasParameter
    hasParent
    hasReturnType
    hasStaticStorageDuration

@@ -8,7 +8,7 @@ __all__ = [
     'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyParameterMatcher',
     'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
     'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher', 
-    'PointeeTypeTraversalMatcher'
+    'PointeeTypeTraversalMatcher', 'ParameterMatcher'
 ]
 
 
@@ -230,3 +230,16 @@ class CanonicalTypeTraversalMatcher(TypeTraversalMatcher):
 
     def __call__(self, t):
         return self.matcher(self.traversal(t))
+
+
+class ParameterMatcher(Matcher):
+    def __init__(self, N, inner):
+        super(ParameterMatcher, self).__init__(inner)
+        self.N = N
+
+    def __call__(self, cursor):
+        try:
+            arg = list(cursor.get_arguments())[self.N]
+            return super(ParameterMatcher, self).__call__(arg)
+        except:
+            return False

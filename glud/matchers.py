@@ -11,7 +11,7 @@ __all__ = [
     'recordDecl', 'stmt', 'typedefDecl', 'unless', 'isDefinition', 'hasAncestor',
     'isExpansionInFileMatching', 'varDecl', 'hasParent', 'parameterCountIs',
     'hasCanonicalType', 'isStruct', 'isClass', 'isPublic', 'isProtected', 'isPrivate',
-    'pointerType', 'pointee'
+    'pointerType', 'pointee', 'hasParameter'
 ]
 
 
@@ -51,23 +51,6 @@ def anyOf(*args):
     return AnyOfMatcher(*args)
 
 
-def hasType(matcher):
-    """Matches if the type associated with the current cursor matches
-
-    >>> from glud import *
-    >>> config = '''
-    ...  int x;
-    ...  long y;
-    ... '''
-    >>> m = varDecl(hasType(hasName('int')))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    x
-    """
-    return TypeTraversalMatcher(matcher)
-
-
 def anything():
     """Matches anything
 
@@ -88,23 +71,6 @@ def anything():
     Z
     """
     return TrueMatcher()
-
-
-def hasAnyParameter(matcher):
-    """Match if any method or function argument matches
-
-    >>> from glud import *
-    >>> config = '''
-    ... void f();
-    ... void g(int);
-    ... '''
-    >>> m = functionDecl(hasAnyParameter(hasType(builtinType())))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    g
-    """
-    return AnyParameterMatcher(matcher)
 
 
 def builtinType(*args):
@@ -140,28 +106,6 @@ def classTemplateDecl(*args):
     X
     """
     return Matcher(is_kind(CursorKind.CLASS_TEMPLATE), *args)
-
-
-def cxxRecordDecl(*args):
-    """Matches C++ class declarations.
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class W;
-    ...  template<typename T> class X {};
-    ...  struct Y {};
-    ...  union Z {};
-    ... '''
-    >>> m = cxxRecordDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    W
-    X
-    """
-    return Matcher(anyOf(
-                is_kind(CursorKind.CLASS_DECL),
-                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
 
 
 def cxxConstructorDecl(*args):
@@ -220,6 +164,28 @@ def cxxMethodDecl(*args):
     v
     """
     return Matcher(is_kind(CursorKind.CXX_METHOD), *args)
+
+
+def cxxRecordDecl(*args):
+    """Matches C++ class declarations.
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class W;
+    ...  template<typename T> class X {};
+    ...  struct Y {};
+    ...  union Z {};
+    ... '''
+    >>> m = cxxRecordDecl()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    W
+    X
+    """
+    return Matcher(anyOf(
+                is_kind(CursorKind.CLASS_DECL),
+                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
 
 
 def decl(*args):
@@ -317,6 +283,63 @@ def has(*args):
     return ChildAnyOfMatcher(*args)
 
 
+def hasAncestor(matcher):
+    """Matches if the current cursor has an ancestor that matches
+
+    >>> from glud import *
+    >>> config = '''
+    ... namespace X {
+    ...   class Y {};
+    ... }
+    ... class Z {};
+    ... '''
+    >>> m = cxxRecordDecl(
+    ...         hasName('Y'),
+    ...         hasAncestor(namespaceDecl(hasName('X'))))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    Y
+    """
+    return AncestorMatcher(matcher)
+
+
+def hasAnyParameter(matcher):
+    """Match if any method or function argument matches
+
+    >>> from glud import *
+    >>> config = '''
+    ... void f();
+    ... void g(int);
+    ... '''
+    >>> m = functionDecl(hasAnyParameter(hasType(builtinType())))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    g
+    """
+    return AnyParameterMatcher(matcher)
+
+
+def hasCanonicalType(m):
+    """Matches if a cursor has the specified number of arguments
+
+    >>> from glud import *
+    >>> config = '''
+    ...  namespace X {
+    ...   struct Y;
+    ...   Y f();
+    ...  }
+    ... '''
+    >>> m = functionDecl(hasReturnType(hasCanonicalType(hasName('X::Y'))))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    f
+    """
+    return CanonicalTypeTraversalMatcher(m)
+
+
 def hasName(name):
     """Match a cursors spelling against a pattern
 
@@ -332,6 +355,45 @@ def hasName(name):
     X
     """
     return NameMatcher(name)
+
+
+def hasParameter(N, inner):
+    """Matches if the direct parent node matches
+
+    >>> from glud import *
+    >>> config = '''
+    ... void f(int x);
+    ... void g(int y, int x);
+    ... void h();
+    ... '''
+    >>> m = functionDecl(hasParameter(1, hasName('x')))
+    >>> tuc = parse_string(config).cursor
+    >>> for c in tuc.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    g
+    """
+    return ParameterMatcher(N, inner)
+
+
+def hasParent(*args):
+    """Matches if the direct parent node matches
+
+    >>> from glud import *
+    >>> config = '''
+    ... namespace X {
+    ...   int a;
+    ... }
+    ... int b;
+    ... '''
+    >>> m = varDecl(hasParent(namespaceDecl(hasName('X'))))
+    >>> tuc = parse_string(config).cursor
+    >>> for c in tuc.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    a
+    """
+    return ParentMatcher(*args)
 
 
 def hasReturnType(matcher):
@@ -372,6 +434,23 @@ def hasStaticStorageDuration():
     return Matcher(has_storage_class(clang.cindex.StorageClass.STATIC))
 
 
+def hasType(matcher):
+    """Matches if the type associated with the current cursor matches
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int x;
+    ...  long y;
+    ... '''
+    >>> m = varDecl(hasType(hasName('int')))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    """
+    return TypeTraversalMatcher(matcher)
+
+
 def hasTypename(typename):
     """Match if the spelling of the type of a cursor matches a pattern
 
@@ -391,6 +470,40 @@ def hasTypename(typename):
     return TypenameMatcher(typename)
 
 
+def isClass():
+    """Matches if a cursor is a class
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X;
+    ...  struct Y;
+    ... '''
+    >>> m = isClass()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+    return Matcher(is_kind(CursorKind.CLASS_DECL))
+
+
+def isDefinition():
+    """Matches if the cursor is a definition
+
+    >>> from glud import *
+    >>> config = '''
+    ... class X {};
+    ... class Y;
+    ... '''
+    >>> m = cxxRecordDecl(isDefinition())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+    return Matcher(is_definition)
+
+
 def isDerivedFrom(name):
     """Match if a C++ type inherits from a named class
 
@@ -408,6 +521,79 @@ def isDerivedFrom(name):
     Z
     """
     return AnyBaseClassMatcher(hasTypename(name))
+
+
+def isExpansionInFileMatching(pattern):
+    """Matches if the nodes location matches a pattern
+
+    >>> from glud import *
+    >>> config = '''
+    ... class X;
+    ... '''
+    >>> m = isExpansionInFileMatching('tmp.cpp')
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    X
+    """
+    return LocationMatcher(pattern)
+
+
+def isPrivate():
+    """Test if a cursor is private
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   private:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isPrivate())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PRIVATE))
+
+
+def isProtected():
+    """Test if a cursor is protected
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   protected:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isProtected())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PROTECTED))
+
+
+def isPublic():
+    """Test if a cursor is public
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X {
+    ...   public:
+    ...    int y;
+    ...  };
+    ... '''
+    >>> m = fieldDecl(isPublic())
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    y
+    """
+    return Matcher(has_access(AccessSpecifier.PUBLIC))
 
 
 def isSameOrDerivedFrom(name):
@@ -430,6 +616,23 @@ def isSameOrDerivedFrom(name):
     return anyOf(hasTypename(name), isDerivedFrom(name))
 
 
+def isStruct():
+    """Matches if a cursor is a struct
+
+    >>> from glud import *
+    >>> config = '''
+    ...  class X;
+    ...  struct Y;
+    ... '''
+    >>> m = isStruct()
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    Y
+    """
+    return Matcher(is_kind(CursorKind.STRUCT_DECL))
+
+
 def namespaceDecl(*args):
     """Match a C++ namespace declaration
 
@@ -444,6 +647,61 @@ def namespaceDecl(*args):
     X
     """
     return Matcher(is_kind(CursorKind.NAMESPACE), *args)
+
+
+def parameterCountIs(N):
+    """Matches if a cursor has the specified number of arguments
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int f();
+    ...  int g(int);
+    ...  int h(int, int);
+    ... '''
+    >>> m = functionDecl(parameterCountIs(1))
+    >>> for c in parse_string(config).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    g
+    """
+    return ParameterCountMatcher(N)
+
+
+def pointee(inner):
+    """Traverse from a pointer to the dereferenced type
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int *x;
+    ...  void *y;
+    ... '''
+    >>> m = varDecl(hasType(pointerType(pointee(hasName('int')))))
+    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    """
+    return PointeeTypeTraversalMatcher(inner)
+
+
+def pointerType(*args):
+    """Test if a cursor has pointer type
+
+    >>> from glud import *
+    >>> config = '''
+    ...  int w;
+    ...  int* x;
+    ...  int** y;
+    ...  int& z = w;
+    ... '''
+    >>> m = varDecl(hasType(pointerType()))
+    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
+    ...     if m(c):
+    ...         print(c.spelling)
+    x
+    y
+    """
+    return AllOfTypeMatcher(is_kind(TypeKind.POINTER), *args)
 
 
 def recordDecl(*args):
@@ -525,60 +783,6 @@ def unless(*args):
     return UnlessMatcher(*args)
 
 
-def isDefinition():
-    """Matches if the cursor is a definition
-
-    >>> from glud import *
-    >>> config = '''
-    ... class X {};
-    ... class Y;
-    ... '''
-    >>> m = cxxRecordDecl(isDefinition())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    X
-    """
-    return Matcher(is_definition)
-
-
-def isExpansionInFileMatching(pattern):
-    """Matches if the nodes location matches a pattern
-
-    >>> from glud import *
-    >>> config = '''
-    ... class X;
-    ... '''
-    >>> m = isExpansionInFileMatching('tmp.cpp')
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    X
-    """
-    return LocationMatcher(pattern)
-
-
-def hasAncestor(matcher):
-    """Matches if the current cursor has an ancestor that matches
-
-    >>> from glud import *
-    >>> config = '''
-    ... namespace X {
-    ...   class Y {};
-    ... }
-    ... class Z {};
-    ... '''
-    >>> m = cxxRecordDecl(
-    ...         hasName('Y'),
-    ...         hasAncestor(namespaceDecl(hasName('X'))))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    Y
-    """
-    return AncestorMatcher(matcher)
-
-
 def varDecl(*args):
     """Matches variable declarations
 
@@ -593,188 +797,3 @@ def varDecl(*args):
     a
     """
     return Matcher(is_kind(CursorKind.VAR_DECL), *args)
-
-
-def hasParent(*args):
-    """Matches if the direct parent node matches
-
-    >>> from glud import *
-    >>> config = '''
-    ... namespace X {
-    ...   int a;
-    ... }
-    ... int b;
-    ... '''
-    >>> m = varDecl(hasParent(namespaceDecl(hasName('X'))))
-    >>> tuc = parse_string(config).cursor
-    >>> for c in tuc.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    a
-    """
-    return ParentMatcher(*args)
-
-
-def parameterCountIs(N):
-    """Matches if a cursor has the specified number of arguments
-
-    >>> from glud import *
-    >>> config = '''
-    ...  int f();
-    ...  int g(int);
-    ...  int h(int, int);
-    ... '''
-    >>> m = functionDecl(parameterCountIs(1))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    g
-    """
-    return ParameterCountMatcher(N)
-
-
-def hasCanonicalType(m):
-    """Matches if a cursor has the specified number of arguments
-
-    >>> from glud import *
-    >>> config = '''
-    ...  namespace X {
-    ...   struct Y;
-    ...   Y f();
-    ...  }
-    ... '''
-    >>> m = functionDecl(hasReturnType(hasCanonicalType(hasName('X::Y'))))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    f
-    """
-    return CanonicalTypeTraversalMatcher(m)
-
-
-def isClass():
-    """Matches if a cursor is a class
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class X;
-    ...  struct Y;
-    ... '''
-    >>> m = isClass()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    X
-    """
-    return Matcher(is_kind(CursorKind.CLASS_DECL))
-
-
-def isStruct():
-    """Matches if a cursor is a struct
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class X;
-    ...  struct Y;
-    ... '''
-    >>> m = isStruct()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    Y
-    """
-    return Matcher(is_kind(CursorKind.STRUCT_DECL))
-
-
-def isPublic():
-    """Test if a cursor is public
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class X {
-    ...   public:
-    ...    int y;
-    ...  };
-    ... '''
-    >>> m = fieldDecl(isPublic())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    y
-    """
-    return Matcher(has_access(AccessSpecifier.PUBLIC))
-
-
-def isProtected():
-    """Test if a cursor is protected
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class X {
-    ...   protected:
-    ...    int y;
-    ...  };
-    ... '''
-    >>> m = fieldDecl(isProtected())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    y
-    """
-    return Matcher(has_access(AccessSpecifier.PROTECTED))
-
-
-def isPrivate():
-    """Test if a cursor is private
-
-    >>> from glud import *
-    >>> config = '''
-    ...  class X {
-    ...   private:
-    ...    int y;
-    ...  };
-    ... '''
-    >>> m = fieldDecl(isPrivate())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    y
-    """
-    return Matcher(has_access(AccessSpecifier.PRIVATE))
-
-
-def pointerType(*args):
-    """Test if a cursor has pointer type
-
-    >>> from glud import *
-    >>> config = '''
-    ...  int w;
-    ...  int* x;
-    ...  int** y;
-    ...  int& z = w;
-    ... '''
-    >>> m = varDecl(hasType(pointerType()))
-    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    x
-    y
-    """
-    return AllOfTypeMatcher(is_kind(TypeKind.POINTER), *args)
-
-
-def pointee(inner):
-    """Traverse from a pointer to the dereferenced type
-
-    >>> from glud import *
-    >>> config = '''
-    ...  int *x;
-    ...  void *y;
-    ... '''
-    >>> m = varDecl(hasType(pointerType(pointee(hasName('int')))))
-    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
-    x
-    """
-    return PointeeTypeTraversalMatcher(inner)

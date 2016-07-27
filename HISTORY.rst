@@ -9,7 +9,7 @@ Release History
 **New Features**
 
 - Added new matchers - parameterCountIs, isExpansionInFileMatching, varDecl,
-  hasParent, hasCanonicalType, pointee and pointerType
+  hasParent, hasParameter, hasCanonicalType, pointee and pointerType
 
 **Improvements**
 
