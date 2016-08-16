@@ -1,14 +1,16 @@
 from clang.cindex import *
+from .traversal import *
 import re
 
 
 __all__ = [
-    'Matcher', 'UnlessMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher',
-    'AnyBaseClassMatcher', 'NameMatcher', 'TypenameMatcher', 'AllOfTypeMatcher',
-    'TypeTraversalMatcher', 'ReturnTypeTraversalMatcher', 'AnyParameterMatcher',
-    'AncestorMatcher', 'TrueMatcher', 'LocationMatcher', 'ParentMatcher',
+    'Matcher', 'TrueMatcher', 'PredMatcher', 'UnlessMatcher', 'AllOfMatcher',
+    'AllOfTypeMatcher', 'AnyOfMatcher', 'ChildAnyOfMatcher', 'AnyBaseClassMatcher',
+    'NameMatcher', 'TypenameMatcher', 'TypeTraversalMatcher',
+    'ReturnTypeTraversalMatcher', 'AnyParameterMatcher', 'AncestorMatcher',
+    'LocationMatcher', 'ParentMatcher', 'ParameterMatcher',
     'ParameterCountMatcher', 'CanonicalTypeTraversalMatcher',
-    'PointeeTypeTraversalMatcher', 'ParameterMatcher'
+    'PointeeTypeTraversalMatcher', 
 ]
 
 
@@ -16,44 +18,75 @@ class Matcher(object):
     """Base class for matchers
     """
 
-    def __init__(self, *args):
-        self.matchers = list(args)
+    def __init__(self):
+        pass
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        ms = (m(cursor) for m in self.matchers)
-        return all(ms)
+        raise NotImplemented
 
 
 class TrueMatcher(Matcher):
     """Matcher that always returns true
     """
 
-    def __init__(self, *args):
+    def __init__(self):
         super(TrueMatcher, self).__init__()
 
     def __call__(self, cursor):
         return True
 
 
+class PredMatcher(Matcher):
+    def __init__(self, pred):
+        super(PredMatcher, self).__init__()
+        self.pred = pred
+
+    def __call__(self, cursor):
+        return self.pred(cursor)
+
+
 class UnlessMatcher(Matcher):
     """Inverts the match of the children
     """
 
-    def __init__(self, *args):
-        super(UnlessMatcher, self).__init__(*args)
+    def __init__(self, innerMatcher):
+        super(UnlessMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
 
     def __call__(self, cursor):
-        return not super(UnlessMatcher, self).__call__(cursor)
+        return not self.innerMatcher(cursor)
+
+
+class AllOfMatcher(Matcher):
+    """Matches if all inner matchers match
+    """
+
+    def __init__(self, *innerMatchers):
+        super(AllOfMatcher, self).__init__()
+        self.innerMatchers = list(innerMatchers)
+
+    def matchNode(self, cursor):
+        ms = (m(cursor) for m in self.innerMatchers)
+        return all(ms)
+
+    def __call__(self, cursor):
+        return self.matchNode(cursor)
 
 
 class AnyOfMatcher(Matcher):
+    """Matches if any of the inner matchers match
+    """
+
     def __init__(self, *args):
-        super(AnyOfMatcher, self).__init__(*args)
+        super(AnyOfMatcher, self).__init__()
+        self.matchers = list(args)
+
+    def matchNode(self, cursor):
+        ms = (m(cursor) for m in self.matchers)
+        return any(ms)
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        return any(m(cursor) for m in self.matchers)
+        return self.matchNode(cursor)
 
 
 class ChildAnyOfMatcher(AnyOfMatcher):
@@ -64,88 +97,87 @@ class ChildAnyOfMatcher(AnyOfMatcher):
         return cursor.get_children()
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
         for c in self.children(cursor):
-            if super(ChildAnyOfMatcher, self).__call__(c):
+            if self.matchNode(c):
                 return True
         return False
 
 
-class AnyBaseClassMatcher(Matcher):
+class AnyBaseClassMatcher(AnyOfMatcher):
     def __init__(self, *args):
         super(AnyBaseClassMatcher, self).__init__(*args)
 
+    def traverse(self, cursor):
+        for c in iter_base_classes(cursor):
+            yield c
+
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
-        for c in cursor.get_children():
-            if c.kind == CursorKind.CXX_BASE_SPECIFIER:
-                cdef = c.get_definition()
-                if cdef is None:
-                    continue
-                if any(m(cdef) for m in self.matchers):
-                    return True
-                elif self(cdef):
-                    return True
+        for c in self.traverse(cursor):
+            if self.matchNode(c):
+                return True
         return False
 
 
 class NameMatcher(Matcher):
     def __init__(self, pattern):
-        """Test if the  name refered to by the cursor matches a regex
-        """
         super(NameMatcher, self).__init__()
         self.pattern = pattern
 
+    def name(self, cursor):
+        return cursor.spelling or ''
+
     def __call__(self, cursor):
-        name = cursor.spelling or ''
+        name = self.name(cursor)
         return re.match(self.pattern + '$', name) is not None
 
 
-class TypenameMatcher(Matcher):
+class TypenameMatcher(NameMatcher):
     def __init__(self, pattern):
-        """Test if the typename refered to by the cursor matches a regex
-        """
-        super(TypenameMatcher, self).__init__([])
-        self.pattern = pattern
+        super(TypenameMatcher, self).__init__(pattern)
 
-    def __call__(self, cursor):
-        typename = cursor.type.spelling or ''
-        return re.match(self.pattern + '$', typename) is not None
+    def name(self, cursor):
+        if cursor is None or cursor.type is None:
+            return ''
+        return cursor.type.spelling or ''
 
 
-class AllOfTypeMatcher(object):
+class AllOfTypeMatcher(AllOfMatcher):
     def __init__(self, *args):
-        self.matchers = list(args)
-
-    def __call__(self, t):
-        assert(t is not None)
-        assert(type(t) == Type)
-        return all(m(t) for m in self.matchers)
+        super(AllOfTypeMatcher, self).__init__(*args)
 
 
-class TypeTraversalMatcher(object):
-    def __init__(self, matcher):
-        self.matcher = matcher
+class TraversalMatcher(Matcher):
+    def __init__(self, innerMatcher):
+        super(TraversalMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
 
     def traverse(self, cursor):
         return cursor.type
 
+    def matchNode(self, n):
+        if n is None:
+            return False
+        return self.innerMatcher(n)
+
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
-        return self.matcher(self.traverse(cursor))
+        c = self.traverse(cursor)
+        return self.matchNode(c)
+
+class TypeTraversalMatcher(TraversalMatcher):
+    def __init__(self, innerMatcher):
+        super(TypeTraversalMatcher, self).__init__(innerMatcher)
+
+    def traverse(self, cursor):
+        assert(type(cursor) == Cursor), str(type(cursor))
+        return cursor.type
 
 
-class PointeeTypeTraversalMatcher(object):
-    def __init__(self, inner):
-        self.inner = inner
+class PointeeTypeTraversalMatcher(TraversalMatcher):
+    def __init__(self, innerMatcher):
+        super(PointeeTypeTraversalMatcher, self).__init__(innerMatcher)
 
-    def __call__(self, t):
-        assert(t is not None)
-        assert(type(t) == Type)
-        return self.inner(t.get_pointee())
+    def traverse(self, t):
+        return t.get_pointee()
 
 
 class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
@@ -156,45 +188,61 @@ class ReturnTypeTraversalMatcher(TypeTraversalMatcher):
         return cursor.result_type
 
 
-class AnyParameterMatcher(object):
-    def __init__(self, matcher):
-        self.matcher = matcher
+class AnyParameterMatcher(Matcher):
+    def __init__(self, innerMatcher):
+        super(AnyParameterMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
+
+    def traverse(self, cursor):
+        return cursor.get_arguments()
+
+    def matchNode(self, cursor):
+        return self.innerMatcher(cursor)
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
-        for a in cursor.get_arguments():
-            if self.matcher(a):
+        for a in self.traverse(cursor):
+            if self.matchNode(a):
                 return True
         return False
 
 
 class AncestorMatcher(Matcher):
-    def __init__(self, m):
-        super(AncestorMatcher, self).__init__(m)
+    def __init__(self, innerMatcher):
+        super(AncestorMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
+
+    def traverse(self, cursor):
+        c = cursor.semantic_parent
+        while c is not None:
+            yield c
+            c = c.semantic_parent
+
+    def matchNode(self, cursor):
+        return self.innerMatcher(cursor)
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
-        c = cursor
-        while c is not None:
-            if super(AncestorMatcher, self).__call__(c):
+        for a in self.traverse(cursor):
+            if self.matchNode(a):
                 return True
-            c = c.semantic_parent
         return False
 
 
 class ParentMatcher(Matcher):
-    def __init__(self, m):
-        super(ParentMatcher, self).__init__(m)
+    def __init__(self, innerMatcher):
+        super(ParentMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
+
+    def traverse(self, cursor):
+        return cursor.semantic_parent
+
+    def matchNode(self, cursor):
+        if cursor is None:
+            return False
+        return self.innerMatcher(cursor)
 
     def __call__(self, cursor):
-        assert(cursor is not None)
-        assert(type(cursor) == Cursor)
-        p = cursor.semantic_parent
-        if p is None:
-            return False
-        return super(ParentMatcher, self).__call__(p)
+        c = self.traverse(cursor)
+        return self.matchNode(c)
 
 
 class LocationMatcher(Matcher):
@@ -216,7 +264,6 @@ class ParameterCountMatcher(Matcher):
         self.N = N
 
     def __call__(self, cursor):
-        assert(cursor is not None)
         return self.N == len(list(cursor.get_arguments()))
 
 
@@ -224,21 +271,20 @@ class CanonicalTypeTraversalMatcher(TypeTraversalMatcher):
     def __init__(self, matcher):
         super(CanonicalTypeTraversalMatcher, self).__init__(matcher)
 
-    def traversal(self, t):
+    def traverse(self, t):
         return t.get_canonical()
-
-    def __call__(self, t):
-        return self.matcher(self.traversal(t))
 
 
 class ParameterMatcher(Matcher):
-    def __init__(self, N, inner):
-        super(ParameterMatcher, self).__init__(inner)
+    def __init__(self, N, innerMatcher):
+        super(ParameterMatcher, self).__init__()
+        self.innerMatcher = innerMatcher
         self.N = N
 
+    def matchNode(self, cursor):
+        return self.innerMatcher(cursor)
+
     def __call__(self, cursor):
-        try:
-            arg = list(cursor.get_arguments())[self.N]
-            return super(ParameterMatcher, self).__call__(arg)
-        except:
-            return False
+        args = list(cursor.get_arguments())
+        return (len(args) > self.N) and self.matchNode(args[self.N])
+

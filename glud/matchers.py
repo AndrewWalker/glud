@@ -24,12 +24,17 @@ def allOf(*args):
     ...  class Y;
     ... '''
     >>> m = allOf(cxxRecordDecl(), hasName('X'))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(*args)
+    return AllOfMatcher(*args)
+
+
+def makeKindMatcher(kinds, *args):
+    inner = [ PredMatcher(is_kind(k)) for k in kinds ]
+    inner += list(args)
+    return allOf(*inner)
 
 
 def anyOf(*args):
@@ -42,9 +47,8 @@ def anyOf(*args):
     ...  enum Z {};
     ... '''
     >>> m = anyOf(varDecl(), isClass())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     x
     Y
     """
@@ -63,9 +67,8 @@ def anything():
     ... }
     ... '''
     >>> m = allOf(anything(), hasParent(namespaceDecl()))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     x
     Y
     Z
@@ -82,9 +85,8 @@ def builtinType(*args):
     ...  bool y;
     ... '''
     >>> m = varDecl(hasType(builtinType()))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     x
     y
     """
@@ -100,12 +102,11 @@ def classTemplateDecl(*args):
     ...  class Y {};
     ... '''
     >>> m = classTemplateDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_kind(CursorKind.CLASS_TEMPLATE), *args)
+    return makeKindMatcher([CursorKind.CLASS_TEMPLATE], *args)
 
 
 def cxxConstructorDecl(*args):
@@ -119,12 +120,11 @@ def cxxConstructorDecl(*args):
     ...  class Y {};
     ... '''
     >>> m = cxxConstructorDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_kind(CursorKind.CONSTRUCTOR), *args)
+    return makeKindMatcher([CursorKind.CONSTRUCTOR], *args)
 
 
 def cxxDestructorDecl(*args):
@@ -138,12 +138,11 @@ def cxxDestructorDecl(*args):
     ...  class Y {};
     ... '''
     >>> m = cxxDestructorDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     ~X
     """
-    return Matcher(is_kind(CursorKind.DESTRUCTOR), *args)
+    return makeKindMatcher([CursorKind.DESTRUCTOR], *args)
 
 
 def cxxMethodDecl(*args):
@@ -157,13 +156,12 @@ def cxxMethodDecl(*args):
     ...  };
     ... '''
     >>> m = cxxMethodDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     u
     v
     """
-    return Matcher(is_kind(CursorKind.CXX_METHOD), *args)
+    return makeKindMatcher([CursorKind.CXX_METHOD], *args)
 
 
 def cxxRecordDecl(*args):
@@ -177,15 +175,17 @@ def cxxRecordDecl(*args):
     ...  union Z {};
     ... '''
     >>> m = cxxRecordDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     W
     X
     """
-    return Matcher(anyOf(
-                is_kind(CursorKind.CLASS_DECL),
-                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
+    kinds = [
+        CursorKind.CLASS_DECL,
+        CursorKind.CLASS_TEMPLATE,
+    ]
+    inner = [ PredMatcher(is_kind(k)) for k in kinds ]
+    return allOf(anyOf(*inner), *args)
 
 
 def decl(*args):
@@ -198,14 +198,13 @@ def decl(*args):
     ...  enum Z {};
     ... '''
     >>> m = decl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     Y
     Z
     """
-    return Matcher(is_decl, *args)
+    return allOf(PredMatcher(is_decl), *args)
 
 
 def enumDecl(*args):
@@ -217,13 +216,13 @@ def enumDecl(*args):
     ...  enum class Y {};
     ... '''
     >>> m = enumDecl()
-    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> args = '-x c++ -std=c++11'.split()
+    >>> for c in walk(m, parse_string(config, args=args).cursor):
+    ...     print(c.spelling)
     X
     Y
     """
-    return Matcher(is_kind(CursorKind.ENUM_DECL), *args)
+    return makeKindMatcher([CursorKind.ENUM_DECL], *args)
 
 
 def fieldDecl(*args):
@@ -237,13 +236,12 @@ def fieldDecl(*args):
     ...  };
     ... '''
     >>> m = fieldDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     u
     v
     """
-    return Matcher(is_kind(CursorKind.FIELD_DECL), *args)
+    return makeKindMatcher([CursorKind.FIELD_DECL], *args)
 
 
 def functionDecl(*args):
@@ -255,13 +253,12 @@ def functionDecl(*args):
     ...  int v();
     ... '''
     >>> m = functionDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     u
     v
     """
-    return Matcher(is_kind(CursorKind.FUNCTION_DECL), *args)
+    return makeKindMatcher([CursorKind.FUNCTION_DECL], *args)
 
 
 def has(*args):
@@ -275,9 +272,8 @@ def has(*args):
     ...  class Y;
     ... '''
     >>> m = cxxRecordDecl(has(cxxMethodDecl()))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
     return ChildAnyOfMatcher(*args)
@@ -296,9 +292,8 @@ def hasAncestor(matcher):
     >>> m = cxxRecordDecl(
     ...         hasName('Y'),
     ...         hasAncestor(namespaceDecl(hasName('X'))))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     Y
     """
     return AncestorMatcher(matcher)
@@ -313,9 +308,8 @@ def hasAnyParameter(matcher):
     ... void g(int);
     ... '''
     >>> m = functionDecl(hasAnyParameter(hasType(builtinType())))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     g
     """
     return AnyParameterMatcher(matcher)
@@ -332,9 +326,8 @@ def hasCanonicalType(m):
     ...  }
     ... '''
     >>> m = functionDecl(hasReturnType(hasCanonicalType(hasName('X::Y'))))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     f
     """
     return CanonicalTypeTraversalMatcher(m)
@@ -349,9 +342,8 @@ def hasName(name):
     ...  class Y {};
     ... '''
     >>> m = cxxRecordDecl(hasName('X'))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
     return NameMatcher(name)
@@ -367,10 +359,8 @@ def hasParameter(N, inner):
     ... void h();
     ... '''
     >>> m = functionDecl(hasParameter(1, hasName('x')))
-    >>> tuc = parse_string(config).cursor
-    >>> for c in tuc.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     g
     """
     return ParameterMatcher(N, inner)
@@ -387,10 +377,8 @@ def hasParent(*args):
     ... int b;
     ... '''
     >>> m = varDecl(hasParent(namespaceDecl(hasName('X'))))
-    >>> tuc = parse_string(config).cursor
-    >>> for c in tuc.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     a
     """
     return ParentMatcher(*args)
@@ -406,9 +394,8 @@ def hasReturnType(matcher):
     ... int v();
     ... '''
     >>> m = functionDecl(hasReturnType(builtinType()))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     v
     """
     return ReturnTypeTraversalMatcher(matcher)
@@ -426,12 +413,11 @@ def hasStaticStorageDuration():
     ... '''
     >>> m = cxxMethodDecl(
     ...         hasStaticStorageDuration())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     u
     """
-    return Matcher(has_storage_class(clang.cindex.StorageClass.STATIC))
+    return PredMatcher(has_storage_class(clang.cindex.StorageClass.STATIC))
 
 
 def hasType(matcher):
@@ -443,9 +429,8 @@ def hasType(matcher):
     ...  long y;
     ... '''
     >>> m = varDecl(hasType(hasName('int')))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     x
     """
     return TypeTraversalMatcher(matcher)
@@ -462,9 +447,8 @@ def hasTypename(typename):
     ... class Y {};
     ... '''
     >>> m = cxxRecordDecl(hasTypename('X::Y'))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.type.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.type.spelling)
     X::Y
     """
     return TypenameMatcher(typename)
@@ -479,12 +463,11 @@ def isClass():
     ...  struct Y;
     ... '''
     >>> m = isClass()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_kind(CursorKind.CLASS_DECL))
+    return PredMatcher(is_kind(CursorKind.CLASS_DECL))
 
 
 def isDefinition():
@@ -496,12 +479,11 @@ def isDefinition():
     ... class Y;
     ... '''
     >>> m = cxxRecordDecl(isDefinition())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_definition)
+    return PredMatcher(is_definition)
 
 
 def isDerivedFrom(name):
@@ -514,9 +496,8 @@ def isDerivedFrom(name):
     ... class Z : public Y {};
     ... '''
     >>> m = cxxRecordDecl(isDerivedFrom('X'))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     Y
     Z
     """
@@ -531,9 +512,8 @@ def isExpansionInFileMatching(pattern):
     ... class X;
     ... '''
     >>> m = isExpansionInFileMatching('tmp.cpp')
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
     return LocationMatcher(pattern)
@@ -550,12 +530,11 @@ def isPrivate():
     ...  };
     ... '''
     >>> m = fieldDecl(isPrivate())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     y
     """
-    return Matcher(has_access(AccessSpecifier.PRIVATE))
+    return PredMatcher(has_access(AccessSpecifier.PRIVATE))
 
 
 def isProtected():
@@ -569,12 +548,11 @@ def isProtected():
     ...  };
     ... '''
     >>> m = fieldDecl(isProtected())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     y
     """
-    return Matcher(has_access(AccessSpecifier.PROTECTED))
+    return PredMatcher(has_access(AccessSpecifier.PROTECTED))
 
 
 def isPublic():
@@ -588,12 +566,11 @@ def isPublic():
     ...  };
     ... '''
     >>> m = fieldDecl(isPublic())
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     y
     """
-    return Matcher(has_access(AccessSpecifier.PUBLIC))
+    return PredMatcher(has_access(AccessSpecifier.PUBLIC))
 
 
 def isSameOrDerivedFrom(name):
@@ -606,9 +583,8 @@ def isSameOrDerivedFrom(name):
     ... class Z : public Y {};
     ... '''
     >>> m = cxxRecordDecl(isSameOrDerivedFrom('X'))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     Y
     Z
@@ -625,12 +601,11 @@ def isStruct():
     ...  struct Y;
     ... '''
     >>> m = isStruct()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     Y
     """
-    return Matcher(is_kind(CursorKind.STRUCT_DECL))
+    return PredMatcher(is_kind(CursorKind.STRUCT_DECL))
 
 
 def namespaceDecl(*args):
@@ -641,12 +616,11 @@ def namespaceDecl(*args):
     ... namespace X { }
     ... '''
     >>> m = namespaceDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_kind(CursorKind.NAMESPACE), *args)
+    return allOf(PredMatcher(is_kind(CursorKind.NAMESPACE)), *args)
 
 
 def parameterCountIs(N):
@@ -659,9 +633,8 @@ def parameterCountIs(N):
     ...  int h(int, int);
     ... '''
     >>> m = functionDecl(parameterCountIs(1))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     g
     """
     return ParameterCountMatcher(N)
@@ -676,9 +649,8 @@ def pointee(inner):
     ...  void *y;
     ... '''
     >>> m = varDecl(hasType(pointerType(pointee(hasName('int')))))
-    >>> for c in parse_string(config, args='-x c++ -std=c++11'.split()).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     x
     """
     return PointeeTypeTraversalMatcher(inner)
@@ -715,19 +687,21 @@ def recordDecl(*args):
     ...  union Z {};
     ... '''
     >>> m = recordDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     W
     X
     Y
     Z
     """
-    return Matcher(anyOf(
-                is_kind(CursorKind.STRUCT_DECL),
-                is_kind(CursorKind.UNION_DECL),
-                is_kind(CursorKind.CLASS_DECL),
-                is_kind(CursorKind.CLASS_TEMPLATE)), *args)
+    kinds = [
+        CursorKind.STRUCT_DECL,
+        CursorKind.UNION_DECL,
+        CursorKind.CLASS_DECL,
+        CursorKind.CLASS_TEMPLATE,
+    ]
+    inner = [ PredMatcher(is_kind(k)) for k in kinds ]
+    return allOf(anyOf(*inner), *args)
 
 
 def stmt(*args):
@@ -745,7 +719,7 @@ def stmt(*args):
     >>> print(i)
     1
     """
-    return Matcher(is_stmt, *args)
+    return allOf(PredMatcher(is_stmt), *args)
 
 
 def typedefDecl(*args):
@@ -756,12 +730,11 @@ def typedefDecl(*args):
     ... typedef int X;
     ... '''
     >>> m = typedefDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     """
-    return Matcher(is_kind(CursorKind.TYPEDEF_DECL), *args)
+    return allOf(PredMatcher(is_kind(CursorKind.TYPEDEF_DECL)), *args)
 
 
 def unless(*args):
@@ -774,9 +747,8 @@ def unless(*args):
     ... class Z {};
     ... '''
     >>> m = cxxRecordDecl(unless(hasName('Y')))
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     X
     Z
     """
@@ -791,9 +763,8 @@ def varDecl(*args):
     ...  int a;
     ... '''
     >>> m = varDecl()
-    >>> for c in parse_string(config).cursor.walk_preorder():
-    ...     if m(c):
-    ...         print(c.spelling)
+    >>> for c in walk(m, parse_string(config).cursor):
+    ...     print(c.spelling)
     a
     """
-    return Matcher(is_kind(CursorKind.VAR_DECL), *args)
+    return allOf(PredMatcher(is_kind(CursorKind.VAR_DECL)), *args)
